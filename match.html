@@ -15,9 +15,10 @@
         <nav id="menu">
             <ul>
                 <li><a href="index.html">Impostazioni Match</a></li>
-                <li><a href="#">Partite Salvate</a></li>
-                <li><a href="#">Video Salvati</a></li>
+                <li><a href="partiteSalvate.html">Partite Salvate</a></li>
+                <li><a href="videoSalvati.html">Video Salvati</a></li>
                 <li><a href="legenda.html">Legenda</a></li>
+                <li> <button id="new-match" class="btn-newPartita">Nuova Partita</button></li>
             </ul>
         </nav>
     </div>
@@ -47,9 +48,10 @@
         <button class="btn-FalloP2">Fallo<br> <span id="score-FalloP2">0</span> </button>
     </div>
 
-    <div id="video-container"></div>
 
     <!--punteggio sotto al campo-->
+
+    <h2 class="nameMatch">Nome Match</h2>
     <div class="scoreboard">
         <div class="scoreboard1">
             <span class="name-player1">Player 1: </span><span id="score-player1">0</span>
@@ -62,9 +64,10 @@
             <span>Set: <span id="win-set2">0</span></span>
         </div>
     </div>
-    <button id="new-match" class="btn-newPartita">Nuova Partita</button>
-    <script src="match.js"></script>
+    <hr>
+    <div id="video-container"></div>
 
+    <script src="match.js"></script>
 </body>
 
 </html>

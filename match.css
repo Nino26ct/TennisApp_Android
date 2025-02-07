@@ -33,10 +33,7 @@ body {
 }
 
 hr {
-  color: white;
-  margin: 0;
-  border: 2px dashed white; /* Linea tratteggiata */
-  background-color: rgb(210, 105, 30);
+  border: 2px solid white;
 }
 
 .btn-player1,
@@ -207,7 +204,7 @@ hr {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-video {
+#camera-view {
   width: 90%;
   /* max-width: 600px; */
   height: 50vh;
@@ -238,6 +235,9 @@ video {
 #camera-error {
   color: red;
   font-size: 14px;
+}
+.nameMatch {
+  text-align: center;
 }
 
 .scoreboard {
@@ -286,7 +286,7 @@ video {
 
 /* Stile del bottone */
 #hamburger-btn {
-  font-size: 24px;
+  font-size: 35px;
   background: none;
   border: none;
   cursor: pointer;
@@ -327,6 +327,36 @@ video {
 /* Classe per mostrare il menu */
 .show {
   display: block !important;
+}
+
+#video-container {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  max-width: 800px;
+}
+
+.video-wrapper {
+  display: flex;
+  flex-direction: column; /* Imposta la disposizione verticale */
+  align-items: center; /* Centra il contenuto */
+  width: 48%; /* Due elementi per riga */
+  max-width: 400px;
+}
+
+.video-wrapper a {
+  text-decoration: none;
+  color: blue;
+  font-weight: bold;
+}
+
+#video-container video {
+  width: 200px; /* Occupa circa metà dello spazio disponibile */
+  max-width: 400px; /* Imposta una larghezza massima */
+  height: 130px; /* Mantiene le proporzioni */
 }
 
 @media screen and (orientation: landscape) {
@@ -450,5 +480,34 @@ video {
     transition: all 0.2s ease;
     cursor: pointer;
     color: #333;
+  }
+
+  #video-container {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    max-width: 800px;
+  }
+
+  .video-wrapper {
+    display: flex;
+    flex-direction: column; /* Imposta la disposizione verticale */
+    align-items: center; /* Centra il contenuto */
+    width: 48%; /* Due elementi per riga */
+    max-width: 400px;
+  }
+
+  .video-wrapper a {
+    text-decoration: none;
+    color: blue;
+    font-weight: bold;
+  }
+
+  #video-container video {
+    width: 300px; /* Occupa circa metà dello spazio disponibile */
+    max-width: 400px; /* Imposta una larghezza massima */
+    height: 180px; /* Mantiene le proporzioni */
   }
 }

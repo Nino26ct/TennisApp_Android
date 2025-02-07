@@ -2,13 +2,17 @@ const startMatchButton = document.getElementById("start-match");
 
 startMatchButton.addEventListener("click", () => {
   // Raccogli i dati inseriti dall'utente
+  const nameMatch = document
+    .getElementById("nameMatch")
+    .value.trim()
+    .toUpperCase();
   const nameP1 = document.getElementById("nameP1").value.trim().toUpperCase();
   const nameP2 = document.getElementById("nameP2").value.trim().toUpperCase();
   const gameCount = document.getElementById("game").value;
   const setCount = document.getElementById("set").value;
 
   // Verifica che i campi obbligatori siano compilati
-  if (!nameP1 || !nameP2 || !setCount) {
+  if (!nameMatch || !nameP1 || !nameP2 || !setCount) {
     alert("Per favore, completa tutti i campi obbligatori.");
     return;
   }
@@ -17,6 +21,7 @@ startMatchButton.addEventListener("click", () => {
   localStorage.setItem(
     "matchSettings",
     JSON.stringify({
+      nameMatch,
       nameP1,
       nameP2,
       gameCount: parseInt(gameCount, 10),
