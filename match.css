@@ -357,6 +357,7 @@ hr {
   width: 200px; /* Occupa circa metà dello spazio disponibile */
   max-width: 400px; /* Imposta una larghezza massima */
   height: 130px; /* Mantiene le proporzioni */
+  border: 2px solid white;
 }
 
 #mostraNascondiVideo {
