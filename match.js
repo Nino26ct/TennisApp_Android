@@ -511,6 +511,7 @@ const startCameraButton = document.getElementById("start-camera");
 const stopCameraButton = document.getElementById("stop-camera");
 const cameraError = document.getElementById("camera-error");
 const videoContainer = document.getElementById("video-container"); // Contenitore per i video salvati
+const mostraNascondiVideoBtn = document.getElementById("mostraNascondiVideo");
 
 let stream; // Flusso video
 let mediaRecorder; // Oggetto per registrare il video
@@ -608,6 +609,20 @@ function saveVideo() {
   // Aggiungi il contenitore al #video-container
   videoContainer.appendChild(videoWrapper);
 }
+
+//Per mostrare o nascondere i video
+mostraNascondiVideoBtn.addEventListener("click", () => {
+  if (
+    videoContainer.style.display === "none" ||
+    videoContainer.style.display === ""
+  ) {
+    videoContainer.style.display = "flex";
+    mostraNascondiVideoBtn.textContent = "Nascondi Video";
+  } else {
+    videoContainer.style.display = "none";
+    mostraNascondiVideoBtn.textContent = "Mostra Video";
+  }
+});
 
 // Ferma la videocamera e interrompe la registrazione **senza salvare il video**
 stopCameraButton.addEventListener("click", () => {

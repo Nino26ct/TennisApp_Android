@@ -183,8 +183,8 @@ hr {
   /* position: absolute; */
   /* bottom: 10px;
   right: 10px; */
-  margin-left: 15px;
-  margin-top: 10px;
+  margin-left: 0px;
+  margin-top: 15px;
   padding: 10px 15px;
   font-size: 15px;
   font-weight: bold;
@@ -321,7 +321,7 @@ hr {
 #menu a {
   text-decoration: none;
   color: black;
-  font-size: 18px;
+  font-size: 22px;
 }
 
 /* Classe per mostrare il menu */
@@ -357,6 +357,20 @@ hr {
   width: 200px; /* Occupa circa metà dello spazio disponibile */
   max-width: 400px; /* Imposta una larghezza massima */
   height: 130px; /* Mantiene le proporzioni */
+}
+
+#mostraNascondiVideo {
+  margin-left: 15px;
+  margin-top: 10px;
+  background-color: #007bff; /* Blu acceso */
+  color: white; /* Testo bianco */
+  font-size: 18px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
 }
 
 @media screen and (orientation: landscape) {
@@ -484,7 +498,6 @@ hr {
 
   #video-container {
     margin-top: 20px;
-    display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 15px;
@@ -492,7 +505,6 @@ hr {
   }
 
   .video-wrapper {
-    display: flex;
     flex-direction: column; /* Imposta la disposizione verticale */
     align-items: center; /* Centra il contenuto */
     width: 48%; /* Due elementi per riga */

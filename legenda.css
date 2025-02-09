@@ -32,7 +32,8 @@ h1 {
   font-size: 16px;
 }
 
-button {
+.btn-green,
+.btn-red {
   /* border: none; */
   border-radius: 8px;
   width: 100px;
@@ -48,4 +49,12 @@ button {
 
 .btn-red {
   background-color: red;
+}
+
+#start-camera {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
 }
