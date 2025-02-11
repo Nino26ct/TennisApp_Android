@@ -374,6 +374,12 @@ hr {
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
 }
 
+.delete-video {
+  background-color: red;
+  color: white;
+  margin-top: 5px;
+}
+
 @media screen and (orientation: landscape) {
   video {
     width: 90%;
