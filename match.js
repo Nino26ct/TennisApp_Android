@@ -38,7 +38,6 @@ const tennisScores = [0, 15, 30, 40];
 
 window.onload = function () {
   loadMatchState();
-  updateTieBreakDisplay();
   updateScoreDisplay(); // Carica lo stato salvato
 
   // Altri codici relativi agli eventi...
@@ -248,22 +247,28 @@ function updateAceDisplay() {
   scoreDisplayAce2.textContent = acePointPlayer2;
 }
 
-// Funzione per aggiornare il display dei punteggi
 function updateScoreDisplay() {
-  if (scorePlayer1 === 3 && scorePlayer2 === 3) {
-    if (advantagePlayer === 1) {
-      scoreDisplayPlayer1.textContent = "Adv";
-      scoreDisplayPlayer2.textContent = "40";
-    } else if (advantagePlayer === 2) {
-      scoreDisplayPlayer1.textContent = "40";
-      scoreDisplayPlayer2.textContent = "Adv";
-    } else {
-      scoreDisplayPlayer1.textContent = "40";
-      scoreDisplayPlayer2.textContent = "40";
-    }
+  if (isTieBreak) {
+    // Se siamo in tie-break, mostra i punteggi del tie-break
+    scoreDisplayPlayer1.textContent = tieBreakPointsPlayer1;
+    scoreDisplayPlayer2.textContent = tieBreakPointsPlayer2;
   } else {
-    scoreDisplayPlayer1.textContent = tennisScores[scorePlayer1];
-    scoreDisplayPlayer2.textContent = tennisScores[scorePlayer2];
+    // Visualizzazione normale
+    if (scorePlayer1 === 3 && scorePlayer2 === 3) {
+      if (advantagePlayer === 1) {
+        scoreDisplayPlayer1.textContent = "Adv";
+        scoreDisplayPlayer2.textContent = "40";
+      } else if (advantagePlayer === 2) {
+        scoreDisplayPlayer1.textContent = "40";
+        scoreDisplayPlayer2.textContent = "Adv";
+      } else {
+        scoreDisplayPlayer1.textContent = "40";
+        scoreDisplayPlayer2.textContent = "40";
+      }
+    } else {
+      scoreDisplayPlayer1.textContent = tennisScores[scorePlayer1];
+      scoreDisplayPlayer2.textContent = tennisScores[scorePlayer2];
+    }
   }
 }
 
@@ -305,17 +310,21 @@ function startTieBreak() {
   isTieBreak = true;
   tieBreakPointsPlayer1 = 0;
   tieBreakPointsPlayer2 = 0;
-  updateTieBreakDisplay();
 }
 
 // Funzione per terminare il tie-break
 function endTieBreak(winner) {
   isTieBreak = false;
+  const matchSettings = JSON.parse(localStorage.getItem("matchSettings"));
+
+  // Usa il numero di set definiti nelle impostazioni della partita
   if (winner === 1) {
-    incrementSet(1, 3, JSON.parse(localStorage.getItem("matchSettings")));
+    incrementSet(1, matchSettings.setCount, matchSettings);
   } else {
-    incrementSet(2, 3, JSON.parse(localStorage.getItem("matchSettings")));
+    incrementSet(2, matchSettings.setCount, matchSettings);
   }
+
+  updateTieBreakDisplay();
 }
 
 // Funzione per verificare chi ha vinto il set
