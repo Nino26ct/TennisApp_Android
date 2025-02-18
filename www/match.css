@@ -19,7 +19,7 @@ body {
 
 .linea-centrale {
   position: absolute;
-  width: 2px; /* Larghezza della linea */
+  width: 1px; /* Larghezza della linea */
   height: 100%; /* Altezza della linea */
   background-color: white; /* Colore della linea */
   top: 0;
