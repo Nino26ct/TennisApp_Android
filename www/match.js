@@ -9,6 +9,7 @@ const btnAce2 = document.querySelector(".btn-aceP2");
 const btnFallo2 = document.querySelector(".btn-FalloP2");
 
 // Variabili per il punteggio
+const linkImp = document.getElementById("link.impostazioni");
 const newMatch = document.getElementById("new-match");
 
 const winGame1 = document.getElementById("win-game1");
@@ -36,13 +37,15 @@ let advantagePlayer = null; // Tiene traccia del giocatore in vantaggio
 
 const tennisScores = [0, 15, 30, 40];
 
-localStorage.setItem("gameInProgress", "true");
-
 window.onload = function () {
   loadMatchState();
   updateScoreDisplay(); // Carica lo stato salvato
 
-  // Altri codici relativi agli eventi...
+  // Imposta che il gioco è in corso se non è già stato fatto
+  if (localStorage.getItem("gameInProgress") !== "true") {
+    // Se la partita non è in corso, impostala come "in corso"
+    localStorage.setItem("gameInProgress", "true");
+  }
 };
 
 // Funzione per salvare lo stato della partita nel localStorage
@@ -91,6 +94,7 @@ function loadMatchState() {
     updateAceDisplay();
     updateTieBreakDisplay();
     updateFalloDisplay();
+    localStorage.setItem("gameInProgress", "true");
   } else {
     // Se non ci sono dati salvati, inizia la partita con i valori di default (azzerati)
     resetAll();
@@ -465,6 +469,10 @@ btnAce2.addEventListener("click", () => updateScore(2));
 btnAce2.addEventListener("click", () => updateScoreAce(2));
 doubleFaultBtn2.addEventListener("click", () => updateScore(1));
 
+linkImp.addEventListener("click", () => {
+  localStorage.setItem("gameInProgress", "false");
+}); // Imposta a false per indicare che la partita non è in corso})
+
 // Ascoltatore per iniziare una nuova partita
 newMatch.addEventListener("click", () => {
   // 1. Reset dei punteggi e delle variabili
@@ -492,6 +500,7 @@ newMatch.addEventListener("click", () => {
   advantagePlayer = null;
 
   // 2. Pulisci il localStorage per eliminare le impostazioni della partita
+  localStorage.setItem("gameInProgress", "false"); // Imposta a false per indicare che la partita non è in corso
   localStorage.removeItem("matchState");
 
   // 3. Cancella i video da IndexedDB

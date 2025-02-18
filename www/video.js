@@ -1,16 +1,46 @@
 // Variabili per la videocamera
+const videoDiv = document.getElementById("camera-container");
 const videoElement = document.getElementById("camera-view");
 const startCameraButton = document.getElementById("start-camera");
 const stopCameraButton = document.getElementById("stop-camera");
 const cameraError = document.getElementById("camera-error");
 const videoContainer = document.getElementById("video-container"); // Contenitore per i video salvati
 const mostraNascondiVideoBtn = document.getElementById("mostraNascondiVideo");
+const mostraNascondiCameraBtn = document.getElementById("mostraNascondiCamera");
+const campoPunteggio = document.getElementById("sezione-punti");
 
 let stream; // Flusso video
 let mediaRecorder; // Oggetto per registrare il video
 let recordedChunks = []; // Buffer per i chunk video
 let isRecording = false; // Stato della registrazione
 let isStoppingCamera = false; // Flag per evitare il salvataggio quando si spegne la fotocamera
+
+// Funzione per nascondere o mostrare la videocamera
+mostraNascondiCameraBtn.addEventListener("click", () => {
+  // Se la registrazione è in corso, non nascondiamo la videocamera
+  if (isRecording) {
+    alert("La registrazione è in corso. Non puoi nascondere la videocamera.");
+    return;
+  }
+  const isCameraVisible = !videoDiv.classList.contains("hidden"); // Verifica se la videocamera è visibile
+
+  if (isCameraVisible) {
+    // Nasconde la videocamera
+    startCameraButton.classList.add("hidden");
+    stopCameraButton.classList.add("hidden");
+    videoDiv.classList.add("hidden");
+    mostraNascondiCameraBtn.textContent = "Mostra Camera"; // Cambia il testo del bottone
+    campoPunteggio.style.height = "70vh";
+  } else {
+    // Mostra la videocamera
+    startCameraButton.classList.remove("hidden");
+    stopCameraButton.classList.remove("hidden");
+    videoDiv.classList.remove("hidden");
+    mostraNascondiCameraBtn.textContent = "Nascondi Camera"; // Cambia il testo del bottone
+    campoPunteggio.style.height = "";
+    mostraNascondiCameraBtn.style.zIndex = "10";
+  }
+});
 
 // Funzione per avviare la videocamera e iniziare la registrazione
 async function startCamera() {
@@ -226,6 +256,9 @@ stopCameraButton.addEventListener("click", () => {
     stream.getTracks().forEach((track) => track.stop());
     videoElement.srcObject = null;
     stream = null;
+
+    // Aggiorna lo stato della registrazione
+    isRecording = false; // Assicura che il flag venga aggiornato quando la registrazione è fermata
   }
   startCameraButton.style.display = "inline-block";
   stopCameraButton.style.display = "none";

@@ -3,7 +3,7 @@ body {
   margin: 0; /* Rimuove margini esterni */
   padding: 0; /* Rimuove padding interno */
 }
-.sezione-punti {
+#sezione-punti {
   position: relative;
   width: 100%;
   max-width: 600px;
@@ -195,13 +195,17 @@ hr {
   cursor: pointer;
 }
 
-.camera-section {
+#camera-section {
   text-align: center;
   /* background: #fff; */
   border: 1px solid #ddd;
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#camera-container.hidden {
+  display: none;
 }
 
 #camera-view {
@@ -215,6 +219,10 @@ hr {
   object-fit: cover; /* Fa in modo che il video riempia tutto */
 }
 
+#camera-view.hidden {
+  display: none; /* Nasconde il video quando la classe "hidden" è applicata */
+}
+
 #start-camera {
   padding: 10px 20px;
   background-color: #007bff;
@@ -223,6 +231,9 @@ hr {
   border-radius: 5px;
   cursor: pointer;
 }
+#start-camera.hidden {
+  display: none;
+}
 #stop-camera {
   padding: 10px 20px;
   background-color: rgba(210, 8, 8, 0.851);
@@ -230,6 +241,9 @@ hr {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+}
+#stop-camera.hidden {
+  display: none;
 }
 
 #camera-error {

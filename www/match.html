@@ -14,7 +14,7 @@
         <button id="hamburger-btn">☰</button>
         <nav id="menu">
             <ul>
-                <li><a href="index.html">Impostazioni Match</a></li>
+                <li><a id="link.impostazioni" href="index.html">Impostazioni Match</a></li>
                 <li><a href="partiteSalvate.html">Partite Salvate</a></li>
                 <li><a href="videoSalvati.html">Video Salvati</a></li>
                 <li><a href="legenda.html">Legenda</a></li>
@@ -25,16 +25,24 @@
 
 
     <!-- Sezione Telecamera-->
-    <div class="camera-section">
-        <video id="camera-view" autoplay playsinline></video>
-        <br>
-        <button class="btn-camera" id="start-camera">Avvia Fotocamera</button>
-        <button id="stop-camera" style="display: none;">Spegni Fotocamera</button>
-        <p id="camera-error" style="display: none;">Impossibile accedere alla fotocamera.</p>
+
+    <div id="camera-section" class="camera-section">
+        <button id="mostraNascondiCamera">Nascondi Camera</button>
+        <div id="camera-container">
+            <video id="camera-view" autoplay playsinline></video>
+
+            <br>
+            <button class="btn-camera" id="start-camera">Avvia Fotocamera</button>
+            <button id="start-recording" style="display: none;">Avvia Registrazione</button>
+            <button id="stop-recording" style="display: none;">Ferma Registrazione</button>
+
+            <button id="stop-camera" style="display: none;">Spegni Fotocamera</button>
+            <p id="camera-error" style="display: none;">Impossibile accedere alla fotocamera.</p>
+        </div>
     </div>
 
     <!-- campo -->
-    <div class="sezione-punti">
+    <div id="sezione-punti" class="sezione-punti">
         <div class="linea-centrale"></div>
         <p class="pSet">Set Totali: <span id="score-set">0</span></p>
         <p class="pGame">Game TotalixSet: <span id="score-game">0</span></p>

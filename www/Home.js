@@ -1,3 +1,10 @@
+document.addEventListener("DOMContentLoaded", function () {
+  // Controlla se la partita è in corso
+  if (localStorage.getItem("gameInProgress") === "true") {
+    window.location.href = "match.html"; // Se la partita è in corso, vai direttamente alla pagina match
+  }
+});
+
 const startMatchButton = document.getElementById("start-match");
 
 startMatchButton.addEventListener("click", () => {
@@ -29,12 +36,9 @@ startMatchButton.addEventListener("click", () => {
     })
   );
 
+  // Imposta che la partita è iniziata
+  localStorage.setItem("gameInProgress", "true");
+
   // Reindirizza alla pagina match.html
   window.location.href = "match.html";
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-  if (localStorage.getItem("gameInProgress") === "true") {
-    window.location.href = "match.html"; // Cambia con la tua pagina della partita
-  }
 });
