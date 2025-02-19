@@ -185,7 +185,10 @@ function addVideoToPage(blob, id, matchState, matchSettings) {
   const nameP2 = matchSettings.nameP2 || "Pippa";
   const scoreDisplayPlayer1 = matchState.scoreDisplayPlayer1 || "0"; // Se non c'è, metti 0
   const scoreDisplayPlayer2 = matchState.scoreDisplayPlayer2 || "0"; // Se non c'è, metti 0
-
+  const winSet1 = matchState.winSet1 || "0";
+  const winSet2 = matchState.winSet2 || "0";
+  const winGame1 = matchState.winGame1 || "0";
+  const winGame2 = matchState.winGame2 || "0";
   // Aggiungi il testo dello stato del match
   const matchInfo = document.createElement("div");
   matchInfo.classList.add("score-in-video");
@@ -195,8 +198,9 @@ function addVideoToPage(blob, id, matchState, matchSettings) {
      <div class="dropdown">
     <button class="dropbtn">Punteggio ▼</button>
     <div class="dropdown-content" style="display: none;">
-      <p>${nameP1} - ${scoreDisplayPlayer1}</p>
-      <p>${nameP2} - ${scoreDisplayPlayer2}</p>
+    <p>Set: ${winSet1} <span> Game: ${winGame1} </span> <span>${nameP1} - ${scoreDisplayPlayer1}</span> </p>      
+    <p>Set: ${winSet2} <span> Game: ${winGame2} </span> <span>${nameP2} - ${scoreDisplayPlayer2}</span> </p>
+
     </div>
   </div>
 `;
