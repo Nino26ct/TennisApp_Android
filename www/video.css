@@ -1,0 +1,74 @@
+/* Stile per il pop-up video */
+.video-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8); /* Sfondo scuro */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popup-video {
+  max-width: 90%;
+  max-height: 80vh;
+  border: 3px solid white;
+  border-radius: 10px;
+}
+
+.close-popup {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: red;
+  color: white;
+  border: none;
+  font-size: 20px;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.video-icon {
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+}
+
+.dropbtn {
+  width: 80px;
+  height: 50px;
+  background-color: #3498db;
+  color: white;
+  padding: 7px;
+  font-size: 12px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.dropdown-content {
+  position: absolute;
+  background-color: white;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.delete-video {
+  background-color: red;
+  width: 40px;
+  padding: 5px;
+  color: white;
+  margin-top: 5px;
+}
+
+@media screen and (orientation: landscape) {
+  .close-popup {
+    top: 20px;
+  }
+}

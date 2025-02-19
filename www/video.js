@@ -132,10 +132,17 @@ function openDB(callback) {
 function saveVideo() {
   const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType });
 
+  // Ottieni lo stato del match
+  const matchState = JSON.parse(localStorage.getItem("matchState"));
+  const matchSettings = JSON.parse(localStorage.getItem("matchSettings"));
   openDB((db) => {
     const transaction = db.transaction(DB_STORE, "readwrite");
     const store = transaction.objectStore(DB_STORE);
-    store.add({ video: blob });
+    store.add({
+      video: blob,
+      matchState: matchState,
+      matchSettings: matchSettings, // Aggiungi lo stato del match
+    });
 
     transaction.oncomplete = () => {
       loadSavedVideos(); // Aggiorna la lista dei video sulla pagina
@@ -153,39 +160,98 @@ function loadSavedVideos() {
     const request = store.getAll();
 
     request.onsuccess = () => {
-      request.result.forEach((data) => addVideoToPage(data.video, data.id));
+      request.result.forEach((data) =>
+        addVideoToPage(data.video, data.id, data.matchState, data.matchSettings)
+      );
     };
   });
 }
 
 // Funzione per aggiungere un video alla pagina
-function addVideoToPage(blob, id) {
-  const videoItem = document.createElement("video");
-  videoItem.src = URL.createObjectURL(blob);
-  videoItem.controls = true;
-  videoItem.classList.add("video-salvati");
-
+function addVideoToPage(blob, id, matchState, matchSettings) {
   // Crea un contenitore per il video
   const videoWrapper = document.createElement("div");
   videoWrapper.classList.add("video-wrapper");
+
+  // Creazione dell'icona del video
+  const videoIcon = document.createElement("img");
+  videoIcon.src = "iconaVideo.webp"; // Sostituisci con l'URL della tua icona video
+  videoIcon.classList.add("video-icon");
+  videoIcon.alt = "Video salvato";
+  videoIcon.addEventListener("click", () => openVideoPopup(blob));
+
+  // Recupera il punteggio dai dati salvati
+  const nameP1 = matchSettings.nameP1 || "Pippo";
+  const nameP2 = matchSettings.nameP2 || "Pippa";
+  const scoreDisplayPlayer1 = matchState.scoreDisplayPlayer1 || "0"; // Se non c'è, metti 0
+  const scoreDisplayPlayer2 = matchState.scoreDisplayPlayer2 || "0"; // Se non c'è, metti 0
+
+  // Aggiungi il testo dello stato del match
+  const matchInfo = document.createElement("div");
+  matchInfo.classList.add("score-in-video");
+
+  // Struttura del menu a cascata
+  matchInfo.innerHTML = `
+     <div class="dropdown">
+    <button class="dropbtn">Punteggio ▼</button>
+    <div class="dropdown-content" style="display: none;">
+      <p>${nameP1} - ${scoreDisplayPlayer1}</p>
+      <p>${nameP2} - ${scoreDisplayPlayer2}</p>
+    </div>
+  </div>
+`;
+
+  // Evento per aprire il punteggio
+  matchInfo.querySelector(".dropbtn").addEventListener("click", function () {
+    const dropdownContent = matchInfo.querySelector(".dropdown-content");
+    dropdownContent.style.display =
+      dropdownContent.style.display === "none" ? "block" : "none";
+  });
 
   // Crea un link per scaricare il video
   const downloadLink = document.createElement("a");
   downloadLink.href = URL.createObjectURL(blob);
   downloadLink.download = "video_" + new Date().toISOString() + ".webm";
-  downloadLink.textContent = "Scarica video";
+  downloadLink.innerHTML = '<i class="fas fa-arrow-down"></i>';
 
   // Pulsante di eliminazione
   const deleteButton = document.createElement("button");
-  deleteButton.textContent = "Elimina";
+  deleteButton.innerHTML = `<i class="fas fa-trash"></i>`;
   deleteButton.classList.add("delete-video");
   deleteButton.addEventListener("click", () => deleteVideo(id, videoWrapper));
 
   // Aggiunge video, link e pulsante al contenitore
-  videoWrapper.appendChild(videoItem);
+  videoWrapper.appendChild(videoIcon);
+  videoWrapper.appendChild(matchInfo); // Mostra informazioni sul match
   videoWrapper.appendChild(downloadLink);
   videoWrapper.appendChild(deleteButton);
   videoContainer.appendChild(videoWrapper);
+}
+
+// Funzione per aprire il pop-up con il video
+function openVideoPopup(blob) {
+  const popup = document.createElement("div");
+  popup.classList.add("video-popup");
+
+  // Creazione del video
+  const videoElement = document.createElement("video");
+  videoElement.src = URL.createObjectURL(blob);
+  videoElement.controls = true;
+  videoElement.autoplay = true;
+  videoElement.classList.add("popup-video");
+
+  // Pulsante di chiusura
+  const closeButton = document.createElement("button");
+  closeButton.textContent = "✖";
+  closeButton.classList.add("close-popup");
+  closeButton.addEventListener("click", () => {
+    document.body.removeChild(popup);
+  });
+
+  // Aggiungere gli elementi al pop-up
+  popup.appendChild(videoElement);
+  popup.appendChild(closeButton);
+  document.body.appendChild(popup);
 }
 
 // Funzione per eliminare un video salvato

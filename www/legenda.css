@@ -58,3 +58,23 @@ h1 {
   border-radius: 5px;
   cursor: pointer;
 }
+
+.back-button {
+  width: 30px;
+  background-color: red; /* Colore blu */
+  color: white; /* Testo bianco */
+  border: none; /* Rimuove il bordo */
+  padding: 10px 20px; /* Distanze interne */
+  font-size: 30px; /* Dimensione del testo */
+  cursor: pointer; /* Cambia il cursore al passaggio del mouse */
+  display: flex;
+  align-items: center;
+  text-align: center;
+  border-radius: 5px; /* Angoli arrotondati */
+  border: 1px solid black;
+  text-decoration: none;
+}
+
+.back-button i {
+  margin-right: 8px; /* Distanza tra l'icona e il testo */
+}

@@ -65,6 +65,16 @@ function saveMatchState() {
     tieBreakPointsPlayer2: tieBreakPointsPlayer2,
     advantagePlayer: advantagePlayer,
     isTieBreak: isTieBreak,
+    btnPlayer1: btnPlayer1.textContent,
+    btnErrorPlayer1: btnErrorPlayer1.textContent,
+    btnAce1: btnAce1.textContent,
+    btnFallo1: btnFallo1.textContent,
+    btnPlayer2: btnPlayer2.textContent,
+    btnErrorPlayer2: btnErrorPlayer2.textContent,
+    btnAce2: btnAce2.textContent,
+    btnFallo2: btnFallo2.textContent,
+    scoreDisplayPlayer1: scoreDisplayPlayer1.textContent,
+    scoreDisplayPlayer2: scoreDisplayPlayer2.textContent,
   };
   localStorage.setItem("matchState", JSON.stringify(matchState));
 }
