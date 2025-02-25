@@ -38,6 +38,7 @@ startMatchButton.addEventListener("click", () => {
 
   // Imposta che la partita è iniziata
   localStorage.setItem("gameInProgress", "true");
+  localStorage.removeItem("matchFinished");
 
   // Reindirizza alla pagina match.html
   window.location.href = "match.html";

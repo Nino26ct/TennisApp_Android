@@ -4,10 +4,9 @@ const videoElement = document.getElementById("camera-view");
 const startCameraButton = document.getElementById("start-camera");
 const stopCameraButton = document.getElementById("stop-camera");
 const cameraError = document.getElementById("camera-error");
-const videoContainer = document.getElementById("video-container"); // Contenitore per i video salvati
-const mostraNascondiVideoBtn = document.getElementById("mostraNascondiVideo");
 const mostraNascondiCameraBtn = document.getElementById("mostraNascondiCamera");
 const campoPunteggio = document.getElementById("sezione-punti");
+const setContainer = document.getElementById("set-container");
 
 let stream; // Flusso video
 let mediaRecorder; // Oggetto per registrare il video
@@ -152,8 +151,6 @@ function saveVideo() {
 
 // Funzione per caricare i video salvati
 function loadSavedVideos() {
-  videoContainer.innerHTML = ""; // Pulisce i video precedenti
-
   openDB((db) => {
     const transaction = db.transaction(DB_STORE, "readonly");
     const store = transaction.objectStore(DB_STORE);
@@ -167,69 +164,136 @@ function loadSavedVideos() {
   });
 }
 
-// Funzione per aggiungere un video alla pagina
+//  // Variabile per tenere traccia dell'ultimo valore di totalGames
+
 function addVideoToPage(blob, id, matchState, matchSettings) {
-  // Crea un contenitore per il video
-  const videoWrapper = document.createElement("div");
-  videoWrapper.classList.add("video-wrapper");
-
-  // Creazione dell'icona del video
-  const videoIcon = document.createElement("img");
-  videoIcon.src = "iconaVideo.webp"; // Sostituisci con l'URL della tua icona video
-  videoIcon.classList.add("video-icon");
-  videoIcon.alt = "Video salvato";
-  videoIcon.addEventListener("click", () => openVideoPopup(blob));
-
-  // Recupera il punteggio dai dati salvati
   const nameP1 = matchSettings.nameP1 || "Pippo";
   const nameP2 = matchSettings.nameP2 || "Pippa";
-  const scoreDisplayPlayer1 = matchState.scoreDisplayPlayer1 || "0"; // Se non c'è, metti 0
-  const scoreDisplayPlayer2 = matchState.scoreDisplayPlayer2 || "0"; // Se non c'è, metti 0
-  const winSet1 = matchState.winSet1 || "0";
-  const winSet2 = matchState.winSet2 || "0";
-  const winGame1 = matchState.winGame1 || "0";
-  const winGame2 = matchState.winGame2 || "0";
-  // Aggiungi il testo dello stato del match
-  const matchInfo = document.createElement("div");
-  matchInfo.classList.add("score-in-video");
+  const scoreDisplayPlayer1 = matchState.scoreDisplayPlayer1 || "0";
+  const scoreDisplayPlayer2 = matchState.scoreDisplayPlayer2 || "0";
+  const totalGames = matchState.totalGames || "1";
+  const currentSetWins = matchState.currentSetWins || 1; // Usa currentSet
 
-  // Struttura del menu a cascata
-  matchInfo.innerHTML = `
-     <div class="dropdown">
-    <button class="dropbtn">Punteggio ▼</button>
-    <div class="dropdown-content" style="display: none;">
-    <p>Set: ${winSet1} <span> Game: ${winGame1} </span> <span>${nameP1} - ${scoreDisplayPlayer1}</span> </p>      
-    <p>Set: ${winSet2} <span> Game: ${winGame2} </span> <span>${nameP2} - ${scoreDisplayPlayer2}</span> </p>
+  // Recupera il numero totale di set dal localStorage
+  const savedSettings = JSON.parse(localStorage.getItem("matchSettings")) || {};
+  const setCount = savedSettings.setCount || 1; // Default 1 set
 
-    </div>
-  </div>
-`;
+  // Recuperiamo o creiamo il contenitore generale per tutti i set
+  let setsContainer = document.querySelector(".sets-container");
+  if (!setsContainer) {
+    setsContainer = document.createElement("div");
+    setsContainer.classList.add("sets-container");
+    document.body.appendChild(setsContainer);
+  }
 
-  // Evento per aprire il punteggio
-  matchInfo.querySelector(".dropbtn").addEventListener("click", function () {
-    const dropdownContent = matchInfo.querySelector(".dropdown-content");
-    dropdownContent.style.display =
-      dropdownContent.style.display === "none" ? "block" : "none";
+  // Creiamo i set mancanti fino al numero di setCount
+  for (let setNumber = 1; setNumber <= setCount; setNumber++) {
+    let setWrapper = setsContainer.querySelector(
+      `.set-wrapper[data-set="${setNumber}"]`
+    );
+
+    if (!setWrapper) {
+      setWrapper = document.createElement("div");
+      setWrapper.classList.add("set-wrapper");
+      setWrapper.setAttribute("data-set", setNumber);
+
+      // Bottone "Set X"
+      const setButton = document.createElement("button");
+      setButton.innerText = `Set: ${setNumber}`;
+      setButton.classList.add("set-button");
+
+      // Contenitore dei game per questo set
+      const setContent = document.createElement("div");
+      setContent.classList.add("set-content", "hidden");
+
+      // Toggle per mostrare/nascondere i game
+      setButton.addEventListener("click", () => {
+        setContent.classList.toggle("hidden");
+      });
+
+      setWrapper.appendChild(setButton);
+      setWrapper.appendChild(setContent);
+      setsContainer.appendChild(setWrapper);
+    }
+  }
+
+  // Recuperiamo il contenitore del set corretto
+  let setWrapper = setsContainer.querySelector(
+    `.set-wrapper[data-set="${currentSetWins}"]`
+  );
+  let setContent = setWrapper.querySelector(".set-content");
+
+  // Recuperiamo o creiamo il contenitore per il game
+  let gameContainer = setContent.querySelector(
+    `div[data-game="${totalGames}"]`
+  );
+  if (!gameContainer) {
+    gameContainer = document.createElement("div");
+    gameContainer.classList.add("game-container");
+    gameContainer.setAttribute("data-game", totalGames);
+
+    // Bottone "Game X"
+    const gameButton = document.createElement("button");
+    gameButton.classList.add("game-button");
+    gameButton.innerText = `Game ${totalGames}`;
+
+    // Contenitore per le info del game
+    const gameContent = document.createElement("div");
+    gameContent.classList.add("game-content", "hidden");
+
+    // Toggle per mostrare/nascondere il game
+    gameButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      gameContent.classList.toggle("hidden");
+    });
+
+    gameContainer.appendChild(gameButton);
+    gameContainer.appendChild(gameContent);
+    setContent.appendChild(gameContainer);
+  }
+
+  // Verifica se le info per questo game sono già presenti
+  let existingMatchInfo = gameContainer.querySelector(
+    `.match-info[data-id="${id}"]`
+  );
+  if (!existingMatchInfo) {
+    // Creazione dell'icona del video
+    const videoIcon = document.createElement("img");
+    videoIcon.src = "iconaVideo.webp";
+    videoIcon.classList.add("video-icon");
+    videoIcon.alt = "Video salvato";
+    videoIcon.addEventListener("click", () => openVideoPopup(blob));
+
+    // Creazione delle info del match
+    const matchInfo = document.createElement("div");
+    matchInfo.classList.add("match-info");
+    matchInfo.setAttribute("data-id", id);
+    matchInfo.innerHTML = `
+      <span>${nameP1} - ${scoreDisplayPlayer1}</span><br>
+      <span>${nameP2} - ${scoreDisplayPlayer2}</span>
+    `;
+
+    // Aggiungi icona video alle info
+    matchInfo.appendChild(videoIcon);
+
+    // Aggiungi info del match al contenitore del game
+    gameContainer.querySelector(".game-content").appendChild(matchInfo);
+  }
+}
+
+function saveMatchInfoToDatabase(blob, id, matchState, matchSettings) {
+  // Aggiungi il matchInfo a IndexedDB
+  openDB((db) => {
+    const transaction = db.transaction(DB_STORE, "readwrite");
+    const store = transaction.objectStore(DB_STORE);
+    store.put({
+      id: id,
+      video: blob,
+      matchState: matchState,
+      matchSettings: matchSettings,
+    });
+    transaction.oncomplete = () => console.log("Match info saved to IndexedDB");
   });
-
-  // Crea un link per scaricare il video
-  const downloadLink = document.createElement("a");
-  downloadLink.href = URL.createObjectURL(blob);
-  downloadLink.download = "video_" + new Date().toISOString() + ".webm";
-  downloadLink.innerHTML = '<i class="fas fa-arrow-down"></i>';
-
-  // Pulsante di eliminazione
-  const deleteButton = document.createElement("button");
-  deleteButton.innerHTML = `<i class="fas fa-trash"></i>`;
-  deleteButton.classList.add("delete-video");
-  deleteButton.addEventListener("click", () => deleteVideo(id, videoWrapper));
-
-  // Aggiunge video, link e pulsante al contenitore
-  videoWrapper.appendChild(videoIcon);
-  videoWrapper.appendChild(matchInfo); // Mostra informazioni sul match
-  videoWrapper.appendChild(downloadLink);
-  videoWrapper.appendChild(deleteButton);
-  videoContainer.appendChild(videoWrapper);
 }
 
 // Funzione per aprire il pop-up con il video
@@ -273,28 +337,6 @@ function deleteVideo(id, videoElement) {
 
 // Carica i video salvati quando la pagina viene caricata
 document.addEventListener("DOMContentLoaded", loadSavedVideos);
-
-// Recupera lo stato di visibilità dal localStorage
-document.addEventListener("DOMContentLoaded", () => {
-  const isHidden = localStorage.getItem("videoContainerHidden") === "true";
-  videoContainer.style.display = isHidden ? "none" : "flex";
-  mostraNascondiVideoBtn.textContent = isHidden
-    ? "Mostra Video"
-    : "Nascondi Video";
-});
-
-// Per mostrare o nascondere i video e salvare lo stato
-mostraNascondiVideoBtn.addEventListener("click", () => {
-  const isCurrentlyHidden = videoContainer.style.display === "none";
-
-  videoContainer.style.display = isCurrentlyHidden ? "flex" : "none";
-  mostraNascondiVideoBtn.textContent = isCurrentlyHidden
-    ? "Nascondi Video"
-    : "Mostra Video";
-
-  // Salva lo stato nel localStorage
-  localStorage.setItem("videoContainerHidden", isCurrentlyHidden);
-});
 
 //FUNZIONE PER ELIMINARE TUTTI I VIDEO CON NUOVA PARTITA
 function deleteAllVideos() {

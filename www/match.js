@@ -34,7 +34,8 @@ let tieBreakPointsPlayer2 = 0;
 let scorePlayer1 = 0;
 let scorePlayer2 = 0;
 let advantagePlayer = null; // Tiene traccia del giocatore in vantaggio
-
+let totalGames = 1;
+let totalSet = 1;
 const tennisScores = [0, 15, 30, 40];
 
 window.onload = function () {
@@ -75,6 +76,9 @@ function saveMatchState() {
     btnFallo2: btnFallo2.textContent,
     scoreDisplayPlayer1: scoreDisplayPlayer1.textContent,
     scoreDisplayPlayer2: scoreDisplayPlayer2.textContent,
+    totalGames: totalGames,
+    totalSet: totalSet,
+    currentSetWins: totalSet,
   };
   localStorage.setItem("matchState", JSON.stringify(matchState));
 }
@@ -304,6 +308,7 @@ function incrementGame(player) {
   } else if (player === 2) {
     winGame2.textContent = currentGameCount2 + 1;
   }
+  totalGames++;
 
   // Attiva il tie-break se i game sono 6-6
   if (
@@ -384,6 +389,43 @@ function checkSetWinner(player) {
   }
 }
 
+// Funzione per terminare la partita
+function endMatch(winnerName) {
+  localStorage.setItem("matchFinished", "true");
+  localStorage.setItem("winner", winnerName); // Salviamo il vincitore
+
+  // Disabilita tutti i pulsanti che incrementano il punteggio
+  const buttons = document.querySelectorAll(
+    ".btn-player1, .btn-erroreP1, .btn-aceP1, .btn-FalloP1, .btn-player2, .btn-erroreP2, .btn-aceP2, .btn-FalloP2"
+  );
+  buttons.forEach((button) => {
+    button.disabled = true;
+  });
+
+  // Crea il messaggio "Fine Partita"
+  const endMessage = document.createElement("div");
+  endMessage.textContent = `Fine Partita - ${winnerName} ha vinto!`;
+  endMessage.style.position = "fixed";
+  endMessage.style.top = "50%";
+  endMessage.style.left = "50%";
+  endMessage.style.transform = "translate(-50%, -50%)";
+  endMessage.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+  endMessage.style.color = "white";
+  endMessage.style.padding = "20px";
+  endMessage.style.fontSize = "24px";
+  endMessage.style.zIndex = "1000";
+  document.body.appendChild(endMessage);
+}
+
+// Quando la pagina viene caricata, controlla se la partita è finita
+window.addEventListener("DOMContentLoaded", () => {
+  const matchFinished = localStorage.getItem("matchFinished");
+  const winner = localStorage.getItem("winner");
+
+  if (matchFinished === "true" && winner) {
+    endMatch(winner); // Ricrea il messaggio di fine partita
+  }
+});
 // Funzione per incrementare il set
 function incrementSet(player, maxSets, matchSettings) {
   const setsToWin = Math.ceil(maxSets / 2);
@@ -393,10 +435,13 @@ function incrementSet(player, maxSets, matchSettings) {
     winSet1.textContent = currentSetWins;
 
     if (currentSetWins === setsToWin) {
-      alert(`${matchSettings.nameP1} ha vinto la partita!`);
+      // alert(`${matchSettings.nameP1} ha vinto la partita!`);
+      endMatch(matchSettings.nameP1);
       resetAll();
-      localStorage.removeItem("gameInProgress");
+      // localStorage.removeItem("gameInProgress");
     } else {
+      totalGames = 1;
+      totalSet++;
       resetGameAndPoints();
     }
   } else if (player === 2) {
@@ -405,10 +450,13 @@ function incrementSet(player, maxSets, matchSettings) {
     winSet2.textContent = currentSetWins;
 
     if (currentSetWins === setsToWin) {
-      alert(`${matchSettings.nameP2} ha vinto la partita!`);
+      // alert(`${matchSettings.nameP2} ha vinto la partita!`);
+      endMatch(matchSettings.nameP1);
       resetAll();
-      localStorage.removeItem("gameInProgress");
+      // localStorage.removeItem("gameInProgress");
     } else {
+      totalGames = 1;
+      totalSet++;
       resetGameAndPoints();
     }
   }
@@ -509,9 +557,13 @@ newMatch.addEventListener("click", () => {
   tieBreakPointsPlayer2 = 0;
   advantagePlayer = null;
 
+  totalGames = 1;
+  totalSet = 1;
+
   // 2. Pulisci il localStorage per eliminare le impostazioni della partita
   localStorage.setItem("gameInProgress", "false"); // Imposta a false per indicare che la partita non è in corso
   localStorage.removeItem("matchState");
+  localStorage.removeItem("matchFinished");
 
   // 3. Cancella i video da IndexedDB
   deleteAllVideos();

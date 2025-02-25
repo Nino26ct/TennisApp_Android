@@ -53,7 +53,7 @@ input::placeholder {
   color: #a0a0b0;
 }
 
-button {
+form button {
   background-color: #21c44f;
   color: #fff;
   border: none;
@@ -65,6 +65,27 @@ button {
   transition: background-color 0.3s ease;
 }
 
-button:hover {
+form button:hover {
   background-color: #3700b3;
+}
+
+.back-button {
+  width: 30px;
+  background-color: red; /* Colore blu */
+  color: white; /* Testo bianco */
+  border: none; /* Rimuove il bordo */
+  padding: 10px 20px; /* Distanze interne */
+  font-size: 30px; /* Dimensione del testo */
+  cursor: pointer; /* Cambia il cursore al passaggio del mouse */
+  display: flex;
+  align-items: center;
+  text-align: center;
+  border-radius: 5px; /* Angoli arrotondati */
+  border: 1px solid black;
+  text-decoration: none;
+  margin-bottom: 20px;
+}
+
+.back-button i {
+  margin-right: 8px; /* Distanza tra l'icona e il testo */
 }

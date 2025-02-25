@@ -358,7 +358,7 @@ hr {
   display: block !important;
 }
 
-#video-container {
+#set-container {
   margin-top: 20px;
   margin-bottom: 10px;
   display: flex;
@@ -388,7 +388,7 @@ hr {
   margin-bottom: 5px;
 }
 
-#video-container video {
+#set-container video {
   width: 200px; /* Occupa circa metà dello spazio disponibile */
   max-width: 400px; /* Imposta una larghezza massima */
   height: 130px; /* Mantiene le proporzioni */
@@ -546,7 +546,7 @@ hr {
     color: #333;
   }
 
-  .video-container {
+  .set-container {
     display: flex;
     flex-wrap: wrap; /* Consente di andare a capo quando necessario */
     gap: 16px; /* Distanza tra le icone */
@@ -571,7 +571,7 @@ hr {
     font-size: 24px; /* Dimensione dell'icona */
   }
 
-  #video-container video {
+  #set-container video {
     width: 100%; /* Occupa tutta la larghezza disponibile */
     height: 180px; /* Mantiene le proporzioni */
     object-fit: cover; /* Fa in modo che il video occupi completamente l'area senza distorsioni */
