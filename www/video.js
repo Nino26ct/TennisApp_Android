@@ -269,8 +269,8 @@ function addVideoToPage(blob, id, matchState, matchSettings) {
     matchInfo.classList.add("match-info");
     matchInfo.setAttribute("data-id", id);
     matchInfo.innerHTML = `
-      <span>${nameP1} - ${scoreDisplayPlayer1}</span><br>
-      <span>${nameP2} - ${scoreDisplayPlayer2}</span>
+       <span>${nameP1} - <span class="scoreDisplayPlayer1">${scoreDisplayPlayer1}</span></span><br>
+  <span>${nameP2} - <span class="scoreDisplayPlayer2">${scoreDisplayPlayer2}</span></span>
     `;
 
     // Aggiungi icona video alle info

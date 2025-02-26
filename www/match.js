@@ -436,6 +436,7 @@ function incrementSet(player, maxSets, matchSettings) {
 
     if (currentSetWins === setsToWin) {
       // alert(`${matchSettings.nameP1} ha vinto la partita!`);
+      totalGames = "Match Point";
       endMatch(matchSettings.nameP1);
       resetAll();
       // localStorage.removeItem("gameInProgress");
@@ -451,6 +452,7 @@ function incrementSet(player, maxSets, matchSettings) {
 
     if (currentSetWins === setsToWin) {
       // alert(`${matchSettings.nameP2} ha vinto la partita!`);
+      totalGames = "Match Point";
       endMatch(matchSettings.nameP1);
       resetAll();
       // localStorage.removeItem("gameInProgress");

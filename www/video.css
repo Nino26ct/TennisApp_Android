@@ -44,6 +44,10 @@
 
 .set-wrapper {
   margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  background-color: #f9f9f9;
 }
 
 .set-button {
@@ -51,26 +55,55 @@
   font-weight: bold;
   padding: 10px;
   cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  width: 100%;
+  text-align: left;
 }
 
 .set-content {
   margin-left: 15px;
+  padding: 10px;
+  border-left: 2px solid #007bff;
 }
 
 .game-container {
   margin-top: 5px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
 }
 
 .game-button {
   font-size: 14px;
   padding: 5px;
   cursor: pointer;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  width: 100%;
 }
 
 .game-content {
   margin-left: 10px;
   padding: 5px;
-  border-left: 2px solid #ccc;
+  border-left: 2px solid #28a745;
+}
+
+.match-info {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f1f1f1;
+
+  color: black;
 }
 
 .delete-video {
@@ -79,6 +112,17 @@
   padding: 5px;
   color: white;
   margin-top: 5px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.scoreDisplayPlayer1,
+.scoreDisplayPlayer2 {
+  color: #ffff00;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
+    1px 1px 0 #000; /* Contorno nero */
 }
 
 @media screen and (orientation: landscape) {
