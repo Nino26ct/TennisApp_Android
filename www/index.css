@@ -17,6 +17,10 @@ body {
   font-weight: bold;
 }
 
+.hidden {
+  display: none;
+}
+
 /* Contenitore del modulo */
 .container {
   background-color: #1c1c24;
