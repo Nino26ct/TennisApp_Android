@@ -4,6 +4,8 @@ body {
   background-color: rgb(156, 151, 151);
   margin: 0; /* Rimuove margini esterni */
   padding: 0; /* Rimuove padding interno */
+  overflow-x: hidden;
+  width: 100%;
 }
 #sezione-punti {
   position: relative;
@@ -407,6 +409,13 @@ hr {
   cursor: pointer;
   transition: background-color 0.3s, transform 0.2s;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+#sezione-punti,
+.scoreboard,
+.video-wrapper {
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 @media screen and (orientation: landscape) {
