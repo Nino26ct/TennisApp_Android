@@ -38,6 +38,9 @@ let totalGames = 1;
 let totalSet = 1;
 const tennisScores = [0, 15, 30, 40];
 
+let isGamePointPlayer1 = false;
+let isGamePointPlayer2 = false;
+
 window.onload = function () {
   loadMatchState();
   updateScoreDisplay(); // Carica lo stato salvato
@@ -211,7 +214,6 @@ function updateScore(player) {
     saveMatchState();
     updateTieBreakDisplay();
 
-    // Controlla se qualcuno ha vinto il tie-break
     if (
       tieBreakPointsPlayer1 >= 7 &&
       tieBreakPointsPlayer1 - tieBreakPointsPlayer2 >= 2
@@ -225,33 +227,41 @@ function updateScore(player) {
     }
   } else {
     if (scorePlayer1 === 3 && scorePlayer2 === 3) {
-      // Punteggio 40 - 40
+      // Deuce (40-40)
       if (advantagePlayer === null) {
-        // Assegna il vantaggio al giocatore corrente
         advantagePlayer = player;
       } else if (advantagePlayer === player) {
-        // Il giocatore con il vantaggio vince il game
-        incrementGame(player);
-        advantagePlayer = null; // Resetta lo stato di vantaggio
+        showWinningPoint(player);
       } else {
-        // Se l'altro giocatore segna, si torna in parità
         advantagePlayer = null;
       }
       saveMatchState();
     } else {
-      // Punteggio normale
+      // Controllo normale
       if (player === 1) {
-        if (scorePlayer1 < tennisScores.length - 1) {
+        if (scorePlayer1 === 3 && isGamePointPlayer1) {
+          // Se il giocatore era già a "Game Point", cambia il game
+          showWinningPoint(1);
+        } else if (scorePlayer1 === 3) {
+          // Se il giocatore arriva a 40 ora, al prossimo sarà "Game Point"
+          isGamePointPlayer1 = true;
+        } else {
           scorePlayer1++;
-        } else {
-          incrementGame(1);
+          isGamePointPlayer1 = false;
         }
+        isGamePointPlayer2 = false;
       } else if (player === 2) {
-        if (scorePlayer2 < tennisScores.length - 1) {
-          scorePlayer2++;
+        if (scorePlayer2 === 3 && isGamePointPlayer2) {
+          // Se il giocatore era già a "Game Point", cambia il game
+          showWinningPoint(2);
+        } else if (scorePlayer2 === 3) {
+          // Se il giocatore arriva a 40 ora, al prossimo sarà "Game Point"
+          isGamePointPlayer2 = true;
         } else {
-          incrementGame(2);
+          scorePlayer2++;
+          isGamePointPlayer2 = false;
         }
+        isGamePointPlayer1 = false;
       }
     }
     updateScoreDisplay();
@@ -267,29 +277,59 @@ function updateAceDisplay() {
   scoreDisplayAce2.textContent = acePointPlayer2;
 }
 
+// Funzione per aggiornare il display
 function updateScoreDisplay() {
   if (isTieBreak) {
-    // Se siamo in tie-break, mostra i punteggi del tie-break
     scoreDisplayPlayer1.textContent = tieBreakPointsPlayer1;
     scoreDisplayPlayer2.textContent = tieBreakPointsPlayer2;
   } else {
-    // Visualizzazione normale
     if (scorePlayer1 === 3 && scorePlayer2 === 3) {
-      if (advantagePlayer === 1) {
-        scoreDisplayPlayer1.textContent = "Adv";
-        scoreDisplayPlayer2.textContent = "40";
-      } else if (advantagePlayer === 2) {
-        scoreDisplayPlayer1.textContent = "40";
-        scoreDisplayPlayer2.textContent = "Adv";
-      } else {
-        scoreDisplayPlayer1.textContent = "40";
-        scoreDisplayPlayer2.textContent = "40";
-      }
+      // Deuce
+      scoreDisplayPlayer1.textContent = advantagePlayer === 1 ? "Adv" : "40";
+      scoreDisplayPlayer2.textContent = advantagePlayer === 2 ? "Adv" : "40";
+      isGamePointPlayer1 = false;
+      isGamePointPlayer2 = false;
+    } else if (advantagePlayer === 1 && isGamePointPlayer1 === true) {
+      // Player 1 has advantage
+      scoreDisplayPlayer1.textContent = "Game Point";
+      scoreDisplayPlayer2.textContent = "40";
+      setTimeout(() => {
+        showWinningPoint(1);
+      }, 500);
+    } else if (advantagePlayer === 2 && isGamePointPlayer2 === true) {
+      // Player 2 has advantage
+      scoreDisplayPlayer1.textContent = "40";
+      scoreDisplayPlayer2.textContent = "Game Point";
+      setTimeout(() => {
+        showWinningPoint(1);
+      }, 500);
+    } else if (isGamePointPlayer1) {
+      // Mostra "Game Point" e cambia game dopo 1 secondo
+      scoreDisplayPlayer1.textContent = "Game Point";
+      scoreDisplayPlayer2.textContent = tennisScores[scorePlayer2];
+      setTimeout(() => {
+        showWinningPoint(1);
+      }, 500);
+    } else if (isGamePointPlayer2) {
+      // Mostra "Game Point" e cambia game dopo 1 secondo
+      scoreDisplayPlayer2.textContent = "Game Point";
+      scoreDisplayPlayer1.textContent = tennisScores[scorePlayer1];
+      setTimeout(() => {
+        showWinningPoint(2);
+      }, 500);
     } else {
+      // Mostra punteggio normale
       scoreDisplayPlayer1.textContent = tennisScores[scorePlayer1];
       scoreDisplayPlayer2.textContent = tennisScores[scorePlayer2];
     }
   }
+}
+// Funzione per mostrare il punto vincente e poi incrementare il game
+function showWinningPoint(player) {
+  setTimeout(() => {
+    incrementGame(player);
+    saveMatchState();
+  }, 500);
 }
 
 // Funzione per aggiornare il display del tie-break
@@ -300,6 +340,11 @@ function updateTieBreakDisplay() {
 
 // Funzione per incrementare il game
 function incrementGame(player) {
+  // Resetta lo stato del Game Point per il nuovo game
+  isGamePointPlayer1 = false;
+  isGamePointPlayer2 = false;
+  advantagePlayer = null;
+
   const currentGameCount1 = parseInt(winGame1.textContent, 10);
   const currentGameCount2 = parseInt(winGame2.textContent, 10);
 
