@@ -29,14 +29,12 @@ mostraNascondiCameraBtn.addEventListener("click", () => {
     stopCameraButton.classList.add("hidden");
     videoDiv.classList.add("hidden");
     mostraNascondiCameraBtn.textContent = "Mostra Camera"; // Cambia il testo del bottone
-    campoPunteggio.style.height = "70vh";
   } else {
     // Mostra la videocamera
     startCameraButton.classList.remove("hidden");
     stopCameraButton.classList.remove("hidden");
     videoDiv.classList.remove("hidden");
     mostraNascondiCameraBtn.textContent = "Nascondi Camera"; // Cambia il testo del bottone
-    campoPunteggio.style.height = "";
     mostraNascondiCameraBtn.style.zIndex = "10";
   }
 });
