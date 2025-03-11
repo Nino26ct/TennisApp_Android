@@ -468,8 +468,8 @@ function checkSetWinner(player) {
 }
 
 // Funzione per terminare la partita
-function endMatch(winnerName) {
-  if (localStorage.getItem("matchFinished") === "true") {
+function endMatch(winnerName, fromLoad = false) {
+  if (!fromLoad && localStorage.getItem("matchFinished") === "true") {
     return; // Evita di salvare la partita più volte
   }
 
@@ -484,8 +484,14 @@ function endMatch(winnerName) {
     button.disabled = true;
   });
 
-  // Crea il messaggio "Fine Partita"
-  const endMessage = document.createElement("div");
+  // Se il messaggio di fine partita non esiste già, lo crea
+  let endMessage = document.getElementById("endMessage");
+  if (!endMessage) {
+    endMessage = document.createElement("div");
+    endMessage.id = "endMessage";
+    document.body.appendChild(endMessage);
+  }
+
   endMessage.textContent = `Fine Partita - ${winnerName} ha vinto!`;
   endMessage.style.position = "fixed";
   endMessage.style.top = "50%";
@@ -496,10 +502,11 @@ function endMatch(winnerName) {
   endMessage.style.padding = "20px";
   endMessage.style.fontSize = "24px";
   endMessage.style.zIndex = "1000";
-  document.body.appendChild(endMessage);
 
-  // Salva lo stato della partita finita
-  saveFinishedMatch();
+  // Salva lo stato della partita finita solo la prima volta
+  if (!fromLoad) {
+    saveFinishedMatch();
+  }
 }
 
 // Quando la pagina viene caricata, controlla se la partita è finita
@@ -508,7 +515,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const winner = localStorage.getItem("winner");
 
   if (matchFinished === "true" && winner) {
-    endMatch(winner); // Ricrea il messaggio di fine partita
+    endMatch(winner, true); // Ripristina il messaggio di fine partita e disabilita i pulsanti
   }
 });
 
