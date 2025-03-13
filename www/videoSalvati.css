@@ -1,0 +1,171 @@
+/* Stile per il pop-up video */
+.video-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8); /* Sfondo scuro */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popup-video {
+  max-width: 90%;
+  max-height: 80vh;
+  border: 3px solid white;
+  border-radius: 10px;
+}
+
+.close-popup {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: red;
+  color: white;
+  border: none;
+  font-size: 20px;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.match-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px; /* Spazio tra i giocatori */
+  margin-top: 5px;
+  padding: 20px; /* Aumenta il padding per rendere l'elemento più grande */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f1f1f1;
+  color: black;
+}
+
+.video-icon {
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-left: auto; /* Sposta l'icona verso destra */
+  margin-right: 5px; /* Aggiungi un margine a destra per ulteriore spostamento */
+  margin-top: -80px !important; /* Sposta l'icona più in alto */
+}
+
+.hidden {
+  display: none;
+}
+
+.set-wrapper {
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  background-color: #f9f9f9;
+}
+
+.set-button {
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  width: 100%;
+  text-align: left;
+}
+
+.set-content {
+  margin-left: 15px;
+  padding: 10px;
+  border-left: 2px solid #007bff;
+}
+
+.game-container {
+  margin-top: 5px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
+}
+
+.game-button {
+  font-size: 14px;
+  padding: 5px;
+  cursor: pointer;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  width: 100%;
+}
+
+.game-content {
+  margin-left: 10px;
+  padding: 5px;
+  border-left: 2px solid #28a745;
+}
+
+.delete-video {
+  background-color: red;
+  width: 40px;
+  padding: 5px;
+  color: white;
+  margin-top: 5px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.scoreDisplayPlayer1,
+.scoreDisplayPlayer2 {
+  color: #ffff00;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
+    1px 1px 0 #000; /* Contorno nero */
+}
+
+.vs {
+  color: red;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
+    1px 1px 0 #000; /* Contorno nero */
+}
+@media screen and (orientation: landscape) {
+  .close-popup {
+    top: 20px;
+  }
+
+  .match-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px; /* Spazio tra i giocatori */
+    margin-top: 10px;
+    padding: 20px; /* Aumenta il padding per rendere l'elemento più grande */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f1f1f1;
+    color: black;
+  }
+
+  .video-icon {
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-left: auto; /* Sposta l'icona verso destra */
+    margin-right: 160px; /* Aggiungi un margine a destra per ulteriore spostamento */
+    margin-top: -80px !important; /* Sposta l'icona più in alto */
+  }
+}

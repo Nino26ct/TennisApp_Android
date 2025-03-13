@@ -14,6 +14,29 @@ let recordedChunks = []; // Buffer per i chunk video
 let isRecording = false; // Stato della registrazione
 let isStoppingCamera = false; // Flag per evitare il salvataggio quando si spegne la fotocamera
 
+// Apri il database IndexedDB
+const DB_NAME = "VideoDB";
+const DB_STORE = "videos";
+
+function openDB(callback) {
+  const request = indexedDB.open(DB_NAME, 1);
+
+  request.onupgradeneeded = (event) => {
+    let db = event.target.result;
+    if (!db.objectStoreNames.contains(DB_STORE)) {
+      db.createObjectStore(DB_STORE, { keyPath: "id", autoIncrement: true });
+    }
+  };
+
+  request.onsuccess = () => {
+    callback(request.result);
+  };
+
+  request.onerror = (event) => {
+    console.error("Errore IndexedDB:", event.target.errorCode);
+  };
+}
+
 // Funzione per nascondere o mostrare la videocamera
 mostraNascondiCameraBtn.addEventListener("click", () => {
   // Se la registrazione è in corso, non nascondiamo la videocamera
@@ -102,29 +125,6 @@ function stopAndSaveRecording() {
   }
 }
 
-// Apri il database IndexedDB
-const DB_NAME = "VideoDB";
-const DB_STORE = "videos";
-
-function openDB(callback) {
-  const request = indexedDB.open(DB_NAME, 1);
-
-  request.onupgradeneeded = (event) => {
-    let db = event.target.result;
-    if (!db.objectStoreNames.contains(DB_STORE)) {
-      db.createObjectStore(DB_STORE, { keyPath: "id", autoIncrement: true });
-    }
-  };
-
-  request.onsuccess = () => {
-    callback(request.result);
-  };
-
-  request.onerror = (event) => {
-    console.error("Errore IndexedDB:", event.target.errorCode);
-  };
-}
-
 // Funzione per salvare il video
 function saveVideo() {
   const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType });
@@ -132,6 +132,8 @@ function saveVideo() {
   // Ottieni lo stato del match
   const matchState = JSON.parse(localStorage.getItem("matchState"));
   const matchSettings = JSON.parse(localStorage.getItem("matchSettings"));
+  const matchId = localStorage.getItem("currentMatchId"); // Ottieni l'identificatore della partita corrente
+
   openDB((db) => {
     const transaction = db.transaction(DB_STORE, "readwrite");
     const store = transaction.objectStore(DB_STORE);
@@ -139,6 +141,8 @@ function saveVideo() {
       video: blob,
       matchState: matchState,
       matchSettings: matchSettings, // Aggiungi lo stato del match
+      matchId: matchId, // Aggiungi l'identificatore della partita
+      hidden: false, // Assicurati che i nuovi video non siano nascosti
     });
 
     transaction.oncomplete = () => {
@@ -146,25 +150,87 @@ function saveVideo() {
     };
   });
 }
-
 // Funzione per caricare i video salvati
 function loadSavedVideos() {
+  const matchId = localStorage.getItem("currentMatchId"); // Ottieni l'identificatore della partita corrente
+
   openDB((db) => {
     const transaction = db.transaction(DB_STORE, "readonly");
     const store = transaction.objectStore(DB_STORE);
     const request = store.getAll();
 
     request.onsuccess = () => {
-      request.result.forEach((data) =>
-        addVideoToPage(data.video, data.id, data.matchState, data.matchSettings)
-      );
+      request.result.forEach((data) => {
+        if (!data.hidden && data.matchId === matchId) {
+          // Mostra solo i video non nascosti e appartenenti alla partita corrente
+          addVideoToPage(
+            data.video,
+            data.id,
+            data.matchState,
+            data.matchSettings
+          );
+        }
+      });
     };
   });
 }
 
+function loadAllVideos() {
+  console.log("loadAllVideos called");
+  openDB((db) => {
+    const transaction = db.transaction(DB_STORE, "readonly");
+    const store = transaction.objectStore(DB_STORE);
+    const request = store.getAll();
+
+    request.onsuccess = () => {
+      console.log("Videos retrieved from database:", request.result);
+      const savedVideosContainer = document.getElementById("saved-videos");
+      const videosByMatch = {};
+
+      // Raggruppa i video per partita
+      request.result.forEach((data) => {
+        if (!videosByMatch[data.matchId]) {
+          videosByMatch[data.matchId] = [];
+        }
+        videosByMatch[data.matchId].push(data);
+      });
+
+      // Aggiungi i video raggruppati alla pagina
+      Object.keys(videosByMatch).forEach((matchId) => {
+        const matchContainer = document.createElement("div");
+        matchContainer.classList.add("match-container");
+        matchContainer.setAttribute("data-match-id", matchId);
+
+        // Ottieni il nome del match dai matchSettings
+        const matchName =
+          videosByMatch[matchId][0].matchSettings.nameMatch ||
+          `Partita ${matchId}`;
+        const matchTitle = document.createElement("h3");
+        matchTitle.textContent = matchName;
+        matchContainer.appendChild(matchTitle);
+
+        videosByMatch[matchId].forEach((data) => {
+          addVideoToPageForVideoSalvati(
+            data.video,
+            data.id,
+            data.matchState,
+            data.matchSettings,
+            matchContainer
+          );
+        });
+
+        savedVideosContainer.appendChild(matchContainer);
+      });
+    };
+
+    request.onerror = () => {
+      console.error("Error retrieving videos from database:", request.error);
+    };
+  });
+}
 //  // Variabile per tenere traccia dell'ultimo valore di totalGames
 
-function addVideoToPage(blob, id, matchState, matchSettings) {
+function addVideoToPage(blob, id, matchState, matchSettings, matchContainer) {
   const nameP1 = matchSettings.nameP1 || "Pippo";
   const nameP2 = matchSettings.nameP2 || "Pippa";
   const scoreDisplayPlayer1 = matchState.scoreDisplayPlayer1 || "0";
@@ -320,19 +386,6 @@ function openVideoPopup(blob) {
   document.body.appendChild(popup);
 }
 
-// Funzione per eliminare un video salvato
-function deleteVideo(id, videoElement) {
-  openDB((db) => {
-    const transaction = db.transaction(DB_STORE, "readwrite");
-    const store = transaction.objectStore(DB_STORE);
-    store.delete(id);
-
-    transaction.oncomplete = () => {
-      videoElement.remove();
-    };
-  });
-}
-
 // Carica i video salvati quando la pagina viene caricata
 document.addEventListener("DOMContentLoaded", loadSavedVideos);
 
@@ -341,10 +394,18 @@ function deleteAllVideos() {
   openDB((db) => {
     const transaction = db.transaction(DB_STORE, "readwrite");
     const store = transaction.objectStore(DB_STORE);
-    const request = store.clear(); // Cancella tutti i dati dallo store
+    const request = store.getAll();
 
     request.onsuccess = () => {
-      //   console.log("Tutti i video eliminati da IndexedDB");
+      const videos = request.result;
+      videos.forEach((video) => {
+        video.hidden = true; // Imposta la proprietà hidden su true
+        store.put(video); // Aggiorna l'oggetto nel database
+      });
+
+      transaction.oncomplete = () => {
+        console.log("Tutti i video sono stati nascosti in IndexedDB");
+      };
     };
 
     request.onerror = (event) => {
@@ -383,3 +444,124 @@ document
     ".btn-player1, .btn-player2, .btn-aceP1, .btn-FalloP1, .btn-erroreP1, .btn-aceP2, .btn-FalloP2, .btn-erroreP2"
   )
   .forEach((button) => button.addEventListener("click", stopAndSaveRecording));
+
+function addVideoToPageForVideoSalvati(
+  blob,
+  id,
+  matchState,
+  matchSettings,
+  matchContainer
+) {
+  const nameP1 = matchSettings.nameP1 || "Pippo";
+  const nameP2 = matchSettings.nameP2 || "Pippa";
+  const scoreDisplayPlayer1 = matchState.scoreDisplayPlayer1 || "0";
+  const scoreDisplayPlayer2 = matchState.scoreDisplayPlayer2 || "0";
+  const totalGames = matchState.totalGames || "1";
+  const currentSetWins = matchState.currentSetWins || 1; // Usa currentSet
+
+  // Recupera il numero totale di set dal localStorage
+  const savedSettings = JSON.parse(localStorage.getItem("matchSettings")) || {};
+  const setCount = savedSettings.setCount || 1; // Default 1 set
+
+  // Recuperiamo o creiamo il contenitore generale per tutti i set
+  let setsContainer = matchContainer.querySelector(".sets-container");
+  if (!setsContainer) {
+    setsContainer = document.createElement("div");
+    setsContainer.classList.add("sets-container");
+    matchContainer.appendChild(setsContainer);
+  }
+
+  // Creiamo i set mancanti fino al numero di setCount
+  for (let setNumber = 1; setNumber <= setCount; setNumber++) {
+    let setWrapper = setsContainer.querySelector(
+      `.set-wrapper[data-set="${setNumber}"]`
+    );
+
+    if (!setWrapper) {
+      setWrapper = document.createElement("div");
+      setWrapper.classList.add("set-wrapper");
+      setWrapper.setAttribute("data-set", setNumber);
+
+      // Bottone "Set X"
+      const setButton = document.createElement("button");
+      setButton.innerText = `Set: ${setNumber}`;
+      setButton.classList.add("set-button");
+
+      // Contenitore dei game per questo set
+      const setContent = document.createElement("div");
+      setContent.classList.add("set-content", "hidden");
+
+      // Toggle per mostrare/nascondere i game
+      setButton.addEventListener("click", () => {
+        setContent.classList.toggle("hidden");
+      });
+
+      setWrapper.appendChild(setButton);
+      setWrapper.appendChild(setContent);
+      setsContainer.appendChild(setWrapper);
+    }
+  }
+
+  // Recuperiamo il contenitore del set corretto
+  let setWrapper = setsContainer.querySelector(
+    `.set-wrapper[data-set="${currentSetWins}"]`
+  );
+  let setContent = setWrapper.querySelector(".set-content");
+
+  // Recuperiamo o creiamo il contenitore per il game
+  let gameContainer = setContent.querySelector(
+    `div[data-game="${totalGames}"]`
+  );
+  if (!gameContainer) {
+    gameContainer = document.createElement("div");
+    gameContainer.classList.add("game-container");
+    gameContainer.setAttribute("data-game", totalGames);
+
+    // Bottone "Game X"
+    const gameButton = document.createElement("button");
+    gameButton.classList.add("game-button");
+    gameButton.innerText = `Game ${totalGames}`;
+
+    // Contenitore per le info del game
+    const gameContent = document.createElement("div");
+    gameContent.classList.add("game-content", "hidden");
+
+    // Toggle per mostrare/nascondere il game
+    gameButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      gameContent.classList.toggle("hidden");
+    });
+
+    gameContainer.appendChild(gameButton);
+    gameContainer.appendChild(gameContent);
+    setContent.appendChild(gameContainer);
+  }
+
+  // Verifica se le info per questo game sono già presenti
+  let existingMatchInfo = gameContainer.querySelector(
+    `.match-info[data-id="${id}"]`
+  );
+  if (!existingMatchInfo) {
+    // Creazione dell'icona del video
+    const videoIcon = document.createElement("img");
+    videoIcon.src = "iconaVideo.webp";
+    videoIcon.classList.add("video-icon");
+    videoIcon.alt = "Video salvato";
+    videoIcon.addEventListener("click", () => openVideoPopup(blob));
+
+    // Creazione delle info del match
+    const matchInfo = document.createElement("div");
+    matchInfo.classList.add("match-info");
+    matchInfo.setAttribute("data-id", id);
+    matchInfo.innerHTML = `
+        <span>${nameP1} - <span class="scoreDisplayPlayer1">${scoreDisplayPlayer1}</span></span> <span class="vs">VS</span>
+        <span>${nameP2} - <span class="scoreDisplayPlayer2">${scoreDisplayPlayer2}</span></span>
+      `;
+
+    // Aggiungi icona video alle info
+    matchInfo.appendChild(videoIcon);
+
+    // Aggiungi info del match al contenitore del game
+    gameContainer.querySelector(".game-content").appendChild(matchInfo);
+  }
+}

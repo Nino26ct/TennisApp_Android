@@ -660,6 +660,10 @@ function saveFinishedMatch() {
 
 // Ascoltatore per iniziare una nuova partita
 newMatch.addEventListener("click", () => {
+  // Genera un identificatore univoco per la nuova partita
+  const matchId = Date.now().toString();
+  localStorage.setItem("currentMatchId", matchId);
+
   // 1. Reset dei punteggi e delle variabili
   scorePlayer1 = 0;
   scorePlayer2 = 0;
@@ -699,7 +703,7 @@ newMatch.addEventListener("click", () => {
   localStorage.removeItem("winner");
 
   // 3. Cancella i video da IndexedDB
-  deleteAllVideos();
+  deleteAllVideos(matchId);
 
   // 4. Ricarica la pagina per iniziare una nuova partita
   window.location.href = "index.html"; // Assicurati che questa sia la pagina di partenza
