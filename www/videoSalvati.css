@@ -68,6 +68,7 @@ body {
   align-items: flex-start;
   margin-left: auto; /* Sposta l'icona verso destra */
   margin-right: 11px; /* Aggiungi un margine a destra per ulteriore spostamento */
+  color: black;
 }
 
 .hidden {

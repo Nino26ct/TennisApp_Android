@@ -150,6 +150,7 @@ function saveVideo() {
     };
   });
 }
+
 // Funzione per caricare i video salvati
 function loadSavedVideos() {
   const matchId = localStorage.getItem("currentMatchId"); // Ottieni l'identificatore della partita corrente
@@ -212,6 +213,15 @@ function loadAllVideos() {
           matchTitle.textContent = matchName;
           matchContainer.appendChild(matchTitle);
 
+          // Aggiungi pulsante di eliminazione della partita
+          const deleteMatchButton = document.createElement("button");
+          deleteMatchButton.textContent = "Elimina Partita";
+          deleteMatchButton.classList.add("delete-match-button");
+          deleteMatchButton.addEventListener("click", () =>
+            deleteMatch(matchId, matchContainer)
+          );
+          matchContainer.appendChild(deleteMatchButton);
+
           videosByMatch[matchId].forEach((data) => {
             addVideoToPageForVideoSalvati(
               data.video,
@@ -221,14 +231,43 @@ function loadAllVideos() {
               matchContainer
             );
           });
-
           savedVideosContainer.appendChild(matchContainer);
+          const hr = document.createElement("hr");
+          savedVideosContainer.appendChild(hr);
         });
       }
     };
 
     request.onerror = () => {
       console.error("Error retrieving videos from database:", request.error);
+    };
+  });
+}
+
+function deleteMatch(matchId, matchContainer) {
+  openDB((db) => {
+    const transaction = db.transaction(DB_STORE, "readwrite");
+    const store = transaction.objectStore(DB_STORE);
+    const request = store.getAll();
+
+    request.onsuccess = () => {
+      const videos = request.result;
+      videos.forEach((video) => {
+        if (video.matchId === matchId) {
+          store.delete(video.id); // Elimina ogni video associato alla partita
+        }
+      });
+
+      transaction.oncomplete = () => {
+        matchContainer.remove(); // Rimuovi il contenitore della partita dalla pagina
+      };
+    };
+
+    request.onerror = (event) => {
+      console.error(
+        "Errore nell'eliminazione della partita:",
+        event.target.error
+      );
     };
   });
 }
@@ -344,27 +383,6 @@ function addVideoToPage(blob, id, matchState, matchSettings, matchContainer) {
     // Aggiungi icona video alle info
     matchInfo.appendChild(videoIcon);
 
-    // Aggiungi pulsante di eliminazione con icona di cestino
-    const deleteButton = document.createElement("button");
-    deleteButton.classList.add("delete-button");
-    deleteButton.style.backgroundColor = "red"; // Imposta il colore del pulsante su rosso
-
-    // Usa SVG invece di un'immagine esterna
-    deleteButton.innerHTML = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="3 6 5 6 21 6"></polyline>
-        <path d="M19 6L18.5 19A2 2 0 0 1 16.5 21H7.5A2 2 0 0 1 5.5 19L5 6"></path>
-        <line x1="10" y1="11" x2="10" y2="17"></line>
-        <line x1="14" y1="11" x2="14" y2="17"></line>
-        <path d="M9 6V3h6v3"></path>
-    </svg>
-`;
-
-    deleteButton.addEventListener("click", () => deleteVideo(id, matchInfo));
-
-    // Aggiungi pulsante di eliminazione alle info
-    matchInfo.appendChild(deleteButton);
-
     // Aggiungi info del match al contenitore del game
     gameContainer.querySelector(".game-content").appendChild(matchInfo);
   }
@@ -477,11 +495,8 @@ function addVideoToPageForVideoSalvati(
   const scoreDisplayPlayer1 = matchState.scoreDisplayPlayer1 || "0";
   const scoreDisplayPlayer2 = matchState.scoreDisplayPlayer2 || "0";
   const totalGames = matchState.totalGames || "1";
-  const currentSetWins = matchState.currentSetWins || 1; // Usa currentSet
-
-  // Recupera il numero totale di set dal localStorage
-  const savedSettings = JSON.parse(localStorage.getItem("matchSettings")) || {};
-  const setCount = savedSettings.setCount || 1; // Default 1 set
+  const currentSetWins = matchState.currentSetWins || 1;
+  const setCount = matchState.setCount || 1; // Usa setCount specifico per ogni partita
 
   // Recuperiamo o creiamo il contenitore generale per tutti i set
   let setsContainer = matchContainer.querySelector(".sets-container");
@@ -574,9 +589,9 @@ function addVideoToPageForVideoSalvati(
     matchInfo.classList.add("match-info");
     matchInfo.setAttribute("data-id", id);
     matchInfo.innerHTML = `
-        <span>${nameP1} - <span class="scoreDisplayPlayer1">${scoreDisplayPlayer1}</span></span> <span class="vs">VS</span>
-        <span>${nameP2} - <span class="scoreDisplayPlayer2">${scoreDisplayPlayer2}</span></span>
-      `;
+          <span>${nameP1} - <span class="scoreDisplayPlayer1">${scoreDisplayPlayer1}</span></span> <span class="vs">VS</span>
+          <span>${nameP2} - <span class="scoreDisplayPlayer2">${scoreDisplayPlayer2}</span></span>
+        `;
 
     // Aggiungi icona video alle info
     matchInfo.appendChild(videoIcon);
@@ -588,14 +603,14 @@ function addVideoToPageForVideoSalvati(
 
     // Usa SVG invece di un'immagine esterna
     deleteButton.innerHTML = `
-     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-         <polyline points="3 6 5 6 21 6"></polyline>
-         <path d="M19 6L18.5 19A2 2 0 0 1 16.5 21H7.5A2 2 0 0 1 5.5 19L5 6"></path>
-         <line x1="10" y1="11" x2="10" y2="17"></line>
-         <line x1="14" y1="11" x2="14" y2="17"></line>
-         <path d="M9 6V3h6v3"></path>
-     </svg>
- `;
+       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+           <polyline points="3 6 5 6 21 6"></polyline>
+           <path d="M19 6L18.5 19A2 2 0 0 1 16.5 21H7.5A2 2 0 0 1 5.5 19L5 6"></path>
+           <line x1="10" y1="11" x2="10" y2="17"></line>
+           <line x1="14" y1="11" x2="14" y2="17"></line>
+           <path d="M9 6V3h6v3"></path>
+       </svg>
+   `;
 
     deleteButton.addEventListener("click", () => deleteVideo(id, matchInfo));
 

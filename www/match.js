@@ -85,6 +85,7 @@ function saveMatchState() {
     totalSet: totalSet,
     currentSetWins: totalSet,
     sets: JSON.parse(localStorage.getItem("sets")) || [], // Aggiungi questa linea
+    setCount: matchSettings.setCount,
   };
   localStorage.setItem("matchState", JSON.stringify(matchState));
 }
@@ -110,6 +111,7 @@ function loadMatchState() {
     isTieBreak = savedState.isTieBreak;
     totalGames = savedState.totalGames;
     totalSet = savedState.totalSet;
+    matchSettings.setCount = savedState.setCount;
 
     // Chiamate per aggiornare le interfacce utente
     updateScoreDisplay();
