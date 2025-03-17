@@ -1,3 +1,8 @@
+body {
+  background-color: #2c2c34;
+  color: #f3ef16;
+}
+
 h1 {
   text-align: center;
 }
@@ -20,4 +25,7 @@ h1 {
 
 .back-button i {
   margin-right: 8px; /* Distanza tra l'icona e il testo */
+}
+#saved-matches {
+  color: white;
 }

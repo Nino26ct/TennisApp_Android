@@ -9,19 +9,21 @@ document.addEventListener("DOMContentLoaded", () => {
       finishedMatches.forEach((match, index) => {
         const sets = match.sets || [];
         const matchSettings = match.matchSettings || {};
+
         matchInfo += `<div id="match-${index}">`;
-        matchInfo += `<h2>Match ${matchSettings.nameMatch || "Sconosciuto"}: ${
-          match.winner
-        } ha vinto!</h2>`;
-        matchInfo += `<h3>${matchSettings.nameP1 || "Giocatore 1"} vs ${
-          matchSettings.nameP2 || "Giocatore 2"
-        }</h3>`;
+        matchInfo += `<h2 style="color: #f3ef16;">${
+          matchSettings.nameMatch || "Sconosciuto"
+        }:</h2> <h3 style="color: #f3ef16;">${
+          matchSettings.nameP1 || "Giocatore 1"
+        } vs ${matchSettings.nameP2 || "Giocatore 2"}</h3>`;
+
         sets.forEach((set, setIndex) => {
           matchInfo += `<p>Set ${setIndex + 1}: ${
             matchSettings.nameP1 || "Giocatore 1"
-          } - ${set.player1Games} | ${
+          } - ${set.player1Games} VS ${
             matchSettings.nameP2 || "Giocatore 2"
-          } - ${set.player2Games}</p>`;
+          } - ${set.player2Games}</p>
+          </h3> <h2 style="color: red"> ${match.winner} ha vinto!</h2>`;
         });
         matchInfo += `<button onclick="deleteMatch(${index})">Elimina</button>`;
         matchInfo += "<hr></div>";

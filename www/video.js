@@ -176,14 +176,12 @@ function loadSavedVideos() {
 }
 
 function loadAllVideos() {
-  console.log("loadAllVideos called");
   openDB((db) => {
     const transaction = db.transaction(DB_STORE, "readonly");
     const store = transaction.objectStore(DB_STORE);
     const request = store.getAll();
 
     request.onsuccess = () => {
-      console.log("Videos retrieved from database:", request.result);
       const savedVideosContainer = document.getElementById("saved-videos");
       const videosByMatch = {};
 
@@ -196,31 +194,37 @@ function loadAllVideos() {
       });
 
       // Aggiungi i video raggruppati alla pagina
-      Object.keys(videosByMatch).forEach((matchId) => {
-        const matchContainer = document.createElement("div");
-        matchContainer.classList.add("match-container");
-        matchContainer.setAttribute("data-match-id", matchId);
+      if (Object.keys(videosByMatch).length === 0) {
+        const noVideosMessage = document.createElement("p");
+        noVideosMessage.textContent = "Nessun video salvato";
+        savedVideosContainer.appendChild(noVideosMessage);
+      } else {
+        Object.keys(videosByMatch).forEach((matchId) => {
+          const matchContainer = document.createElement("div");
+          matchContainer.classList.add("match-container");
+          matchContainer.setAttribute("data-match-id", matchId);
 
-        // Ottieni il nome del match dai matchSettings
-        const matchName =
-          videosByMatch[matchId][0].matchSettings.nameMatch ||
-          `Partita ${matchId}`;
-        const matchTitle = document.createElement("h3");
-        matchTitle.textContent = matchName;
-        matchContainer.appendChild(matchTitle);
+          // Ottieni il nome del match dai matchSettings
+          const matchName =
+            videosByMatch[matchId][0].matchSettings.nameMatch ||
+            `Partita ${matchId}`;
+          const matchTitle = document.createElement("h3");
+          matchTitle.textContent = matchName;
+          matchContainer.appendChild(matchTitle);
 
-        videosByMatch[matchId].forEach((data) => {
-          addVideoToPageForVideoSalvati(
-            data.video,
-            data.id,
-            data.matchState,
-            data.matchSettings,
-            matchContainer
-          );
+          videosByMatch[matchId].forEach((data) => {
+            addVideoToPageForVideoSalvati(
+              data.video,
+              data.id,
+              data.matchState,
+              data.matchSettings,
+              matchContainer
+            );
+          });
+
+          savedVideosContainer.appendChild(matchContainer);
         });
-
-        savedVideosContainer.appendChild(matchContainer);
-      });
+      }
     };
 
     request.onerror = () => {
@@ -340,6 +344,27 @@ function addVideoToPage(blob, id, matchState, matchSettings, matchContainer) {
     // Aggiungi icona video alle info
     matchInfo.appendChild(videoIcon);
 
+    // Aggiungi pulsante di eliminazione con icona di cestino
+    const deleteButton = document.createElement("button");
+    deleteButton.classList.add("delete-button");
+    deleteButton.style.backgroundColor = "red"; // Imposta il colore del pulsante su rosso
+
+    // Usa SVG invece di un'immagine esterna
+    deleteButton.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 21 6"></polyline>
+        <path d="M19 6L18.5 19A2 2 0 0 1 16.5 21H7.5A2 2 0 0 1 5.5 19L5 6"></path>
+        <line x1="10" y1="11" x2="10" y2="17"></line>
+        <line x1="14" y1="11" x2="14" y2="17"></line>
+        <path d="M9 6V3h6v3"></path>
+    </svg>
+`;
+
+    deleteButton.addEventListener("click", () => deleteVideo(id, matchInfo));
+
+    // Aggiungi pulsante di eliminazione alle info
+    matchInfo.appendChild(deleteButton);
+
     // Aggiungi info del match al contenitore del game
     gameContainer.querySelector(".game-content").appendChild(matchInfo);
   }
@@ -356,7 +381,6 @@ function saveMatchInfoToDatabase(blob, id, matchState, matchSettings) {
       matchState: matchState,
       matchSettings: matchSettings,
     });
-    transaction.oncomplete = () => console.log("Match info saved to IndexedDB");
   });
 }
 
@@ -402,10 +426,6 @@ function deleteAllVideos() {
         video.hidden = true; // Imposta la proprietà hidden su true
         store.put(video); // Aggiorna l'oggetto nel database
       });
-
-      transaction.oncomplete = () => {
-        console.log("Tutti i video sono stati nascosti in IndexedDB");
-      };
     };
 
     request.onerror = (event) => {
@@ -561,7 +581,67 @@ function addVideoToPageForVideoSalvati(
     // Aggiungi icona video alle info
     matchInfo.appendChild(videoIcon);
 
+    // Aggiungi pulsante di eliminazione con icona di cestino
+    const deleteButton = document.createElement("button");
+    deleteButton.classList.add("delete-button");
+    deleteButton.style.backgroundColor = "red"; // Imposta il colore del pulsante su rosso
+
+    // Usa SVG invece di un'immagine esterna
+    deleteButton.innerHTML = `
+     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+         <polyline points="3 6 5 6 21 6"></polyline>
+         <path d="M19 6L18.5 19A2 2 0 0 1 16.5 21H7.5A2 2 0 0 1 5.5 19L5 6"></path>
+         <line x1="10" y1="11" x2="10" y2="17"></line>
+         <line x1="14" y1="11" x2="14" y2="17"></line>
+         <path d="M9 6V3h6v3"></path>
+     </svg>
+ `;
+
+    deleteButton.addEventListener("click", () => deleteVideo(id, matchInfo));
+
+    // Aggiungi pulsante di eliminazione alle info
+    matchInfo.appendChild(deleteButton);
+
     // Aggiungi info del match al contenitore del game
     gameContainer.querySelector(".game-content").appendChild(matchInfo);
   }
+}
+
+function deleteVideo(id, matchInfo) {
+  openDB((db) => {
+    const transaction = db.transaction(DB_STORE, "readwrite");
+    const store = transaction.objectStore(DB_STORE);
+    store.delete(id);
+
+    transaction.oncomplete = () => {
+      const gameContainer = matchInfo.closest(".game-container");
+      const setWrapper = gameContainer.closest(".set-wrapper");
+      const setContent = setWrapper.querySelector(".set-content");
+      const matchContainer = setWrapper.closest(".match-container");
+
+      matchInfo.remove(); // Rimuovi l'elemento dalla pagina
+
+      // Verifica se ci sono altri video nel game
+      if (gameContainer.querySelectorAll(".match-info").length === 0) {
+        gameContainer.remove(); // Rimuovi il game se non ci sono altri video
+
+        // Verifica se ci sono altri game nel set
+        if (setContent.querySelectorAll(".game-container").length === 0) {
+          setWrapper.remove(); // Rimuovi il set se non ci sono altri game
+
+          // Verifica se ci sono altri set nella partita
+          if (matchContainer.querySelectorAll(".set-wrapper").length === 0) {
+            matchContainer.remove(); // Rimuovi il nome della partita se non ci sono altri set
+          }
+        }
+      }
+    };
+
+    transaction.onerror = (event) => {
+      console.error(
+        "Errore nell'eliminazione del video:",
+        event.target.errorCode
+      );
+    };
+  });
 }

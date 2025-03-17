@@ -57,6 +57,14 @@
   margin-top: -80px !important; /* Sposta l'icona più in alto */
 }
 
+.delete-button {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-left: auto; /* Sposta l'icona verso destra */
+  margin-right: 11px; /* Aggiungi un margine a destra per ulteriore spostamento */
+}
+
 .hidden {
   display: none;
 }
@@ -107,24 +115,13 @@
   border-radius: 5px;
   transition: background-color 0.3s;
   width: 100%;
+  text-align: left;
 }
 
 .game-content {
   margin-left: 10px;
   padding: 5px;
   border-left: 2px solid #28a745;
-}
-
-.delete-video {
-  background-color: red;
-  width: 40px;
-  padding: 5px;
-  color: white;
-  margin-top: 5px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
 }
 
 .scoreDisplayPlayer1,
@@ -167,5 +164,13 @@
     margin-left: auto; /* Sposta l'icona verso destra */
     margin-right: 160px; /* Aggiungi un margine a destra per ulteriore spostamento */
     margin-top: -80px !important; /* Sposta l'icona più in alto */
+  }
+
+  .delete-button {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-left: auto; /* Sposta l'icona verso destra */
+    margin-right: 165px; /* Aggiungi un margine a destra per ulteriore spostamento */
   }
 }

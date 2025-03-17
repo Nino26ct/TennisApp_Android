@@ -1,3 +1,8 @@
+body {
+  background-color: #2c2c34;
+  color: #f3ef16;
+}
+
 /* Stile per il pop-up video */
 .video-popup {
   position: fixed;
@@ -57,6 +62,14 @@
   margin-top: -80px !important; /* Sposta l'icona più in alto */
 }
 
+.delete-button {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-left: auto; /* Sposta l'icona verso destra */
+  margin-right: 11px; /* Aggiungi un margine a destra per ulteriore spostamento */
+}
+
 .hidden {
   display: none;
 }
@@ -107,24 +120,13 @@
   border-radius: 5px;
   transition: background-color 0.3s;
   width: 100%;
+  text-align: left;
 }
 
 .game-content {
   margin-left: 10px;
   padding: 5px;
   border-left: 2px solid #28a745;
-}
-
-.delete-video {
-  background-color: red;
-  width: 40px;
-  padding: 5px;
-  color: white;
-  margin-top: 5px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
 }
 
 .scoreDisplayPlayer1,
@@ -139,6 +141,27 @@
   text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
     1px 1px 0 #000; /* Contorno nero */
 }
+
+.back-button {
+  width: 30px;
+  background-color: red; /* Colore blu */
+  color: white; /* Testo bianco */
+  border: none; /* Rimuove il bordo */
+  padding: 10px 20px; /* Distanze interne */
+  font-size: 30px; /* Dimensione del testo */
+  cursor: pointer; /* Cambia il cursore al passaggio del mouse */
+  display: flex;
+  align-items: center;
+  text-align: center;
+  border-radius: 5px; /* Angoli arrotondati */
+  border: 1px solid black;
+  text-decoration: none;
+}
+
+.back-button i {
+  margin-right: 8px; /* Distanza tra l'icona e il testo */
+}
+
 @media screen and (orientation: landscape) {
   .close-popup {
     top: 20px;
@@ -167,5 +190,13 @@
     margin-left: auto; /* Sposta l'icona verso destra */
     margin-right: 160px; /* Aggiungi un margine a destra per ulteriore spostamento */
     margin-top: -80px !important; /* Sposta l'icona più in alto */
+  }
+
+  .delete-button {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-left: auto; /* Sposta l'icona verso destra */
+    margin-right: 165px; /* Aggiungi un margine a destra per ulteriore spostamento */
   }
 }

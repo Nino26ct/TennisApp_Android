@@ -108,6 +108,8 @@ function loadMatchState() {
     tieBreakPointsPlayer2 = savedState.tieBreakPointsPlayer2;
     advantagePlayer = savedState.advantagePlayer;
     isTieBreak = savedState.isTieBreak;
+    totalGames = savedState.totalGames;
+    totalSet = savedState.totalSet;
 
     // Chiamate per aggiornare le interfacce utente
     updateScoreDisplay();
@@ -713,7 +715,6 @@ newMatch.addEventListener("click", () => {
 const matchSettings = JSON.parse(localStorage.getItem("matchSettings"));
 
 if (matchSettings) {
-  // console.log("Impostazioni partita:", matchSettings);
   // Usa questi dati nella logica della partita
   const { nameMatch, nameP1, nameP2, gameCount, setCount } = matchSettings;
 
