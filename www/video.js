@@ -176,103 +176,6 @@ function loadSavedVideos() {
   });
 }
 
-function loadAllVideos() {
-  openDB((db) => {
-    const transaction = db.transaction(DB_STORE, "readonly");
-    const store = transaction.objectStore(DB_STORE);
-    const request = store.getAll();
-
-    request.onsuccess = () => {
-      const savedVideosContainer = document.getElementById("saved-videos");
-      const videosByMatch = {};
-
-      // Raggruppa i video per partita
-      request.result.forEach((data) => {
-        if (!videosByMatch[data.matchId]) {
-          videosByMatch[data.matchId] = [];
-        }
-        videosByMatch[data.matchId].push(data);
-      });
-
-      // Aggiungi i video raggruppati alla pagina
-      if (Object.keys(videosByMatch).length === 0) {
-        const noVideosMessage = document.createElement("p");
-        noVideosMessage.textContent = "Nessun video salvato";
-        savedVideosContainer.appendChild(noVideosMessage);
-      } else {
-        Object.keys(videosByMatch).forEach((matchId) => {
-          const matchContainer = document.createElement("div");
-          matchContainer.classList.add("match-container");
-          matchContainer.setAttribute("data-match-id", matchId);
-
-          // Ottieni il nome del match dai matchSettings
-          const matchName =
-            videosByMatch[matchId][0].matchSettings.nameMatch ||
-            `Partita ${matchId}`;
-          const matchTitle = document.createElement("h3");
-          matchTitle.textContent = matchName;
-          matchContainer.appendChild(matchTitle);
-
-          // Aggiungi pulsante di eliminazione della partita
-          const deleteMatchButton = document.createElement("button");
-          deleteMatchButton.textContent = "Elimina Partita";
-          deleteMatchButton.classList.add("delete-match-button");
-          deleteMatchButton.addEventListener("click", () =>
-            deleteMatch(matchId, matchContainer)
-          );
-          matchContainer.appendChild(deleteMatchButton);
-
-          videosByMatch[matchId].forEach((data) => {
-            addVideoToPageForVideoSalvati(
-              data.video,
-              data.id,
-              data.matchState,
-              data.matchSettings,
-              matchContainer
-            );
-          });
-          savedVideosContainer.appendChild(matchContainer);
-          const hr = document.createElement("hr");
-          savedVideosContainer.appendChild(hr);
-        });
-      }
-    };
-
-    request.onerror = () => {
-      console.error("Error retrieving videos from database:", request.error);
-    };
-  });
-}
-
-function deleteMatch(matchId, matchContainer) {
-  openDB((db) => {
-    const transaction = db.transaction(DB_STORE, "readwrite");
-    const store = transaction.objectStore(DB_STORE);
-    const request = store.getAll();
-
-    request.onsuccess = () => {
-      const videos = request.result;
-      videos.forEach((video) => {
-        if (video.matchId === matchId) {
-          store.delete(video.id); // Elimina ogni video associato alla partita
-        }
-      });
-
-      transaction.oncomplete = () => {
-        matchContainer.remove(); // Rimuovi il contenitore della partita dalla pagina
-      };
-    };
-
-    request.onerror = (event) => {
-      console.error(
-        "Errore nell'eliminazione della partita:",
-        event.target.error
-      );
-    };
-  });
-}
-//  // Variabile per tenere traccia dell'ultimo valore di totalGames
-
 function addVideoToPage(blob, id, matchState, matchSettings, matchContainer) {
   const nameP1 = matchSettings.nameP1 || "Pippo";
   const nameP2 = matchSettings.nameP2 || "Pippa";
@@ -482,6 +385,103 @@ document
     ".btn-player1, .btn-player2, .btn-aceP1, .btn-FalloP1, .btn-erroreP1, .btn-aceP2, .btn-FalloP2, .btn-erroreP2"
   )
   .forEach((button) => button.addEventListener("click", stopAndSaveRecording));
+
+//Video Salvati ********//
+function loadAllVideos() {
+  openDB((db) => {
+    const transaction = db.transaction(DB_STORE, "readonly");
+    const store = transaction.objectStore(DB_STORE);
+    const request = store.getAll();
+
+    request.onsuccess = () => {
+      const savedVideosContainer = document.getElementById("saved-videos");
+      const videosByMatch = {};
+
+      // Raggruppa i video per partita
+      request.result.forEach((data) => {
+        if (!videosByMatch[data.matchId]) {
+          videosByMatch[data.matchId] = [];
+        }
+        videosByMatch[data.matchId].push(data);
+      });
+
+      // Aggiungi i video raggruppati alla pagina
+      if (Object.keys(videosByMatch).length === 0) {
+        const noVideosMessage = document.createElement("p");
+        noVideosMessage.textContent = "Nessun video salvato";
+        savedVideosContainer.appendChild(noVideosMessage);
+      } else {
+        Object.keys(videosByMatch).forEach((matchId) => {
+          const matchContainer = document.createElement("div");
+          matchContainer.classList.add("match-container");
+          matchContainer.setAttribute("data-match-id", matchId);
+
+          // Ottieni il nome del match dai matchSettings
+          const matchName =
+            videosByMatch[matchId][0].matchSettings.nameMatch ||
+            `Partita ${matchId}`;
+          const matchTitle = document.createElement("h3");
+          matchTitle.textContent = matchName;
+          matchContainer.appendChild(matchTitle);
+
+          // Aggiungi pulsante di eliminazione della partita
+          const deleteMatchButton = document.createElement("button");
+          deleteMatchButton.textContent = "Elimina Partita";
+          deleteMatchButton.classList.add("delete-match-button");
+          deleteMatchButton.addEventListener("click", () =>
+            deleteMatch(matchId, matchContainer)
+          );
+          matchContainer.appendChild(deleteMatchButton);
+
+          videosByMatch[matchId].forEach((data) => {
+            addVideoToPageForVideoSalvati(
+              data.video,
+              data.id,
+              data.matchState,
+              data.matchSettings,
+              matchContainer
+            );
+          });
+          savedVideosContainer.appendChild(matchContainer);
+          const hr = document.createElement("hr");
+          savedVideosContainer.appendChild(hr);
+        });
+      }
+    };
+
+    request.onerror = () => {
+      console.error("Error retrieving videos from database:", request.error);
+    };
+  });
+}
+
+function deleteMatch(matchId, matchContainer) {
+  openDB((db) => {
+    const transaction = db.transaction(DB_STORE, "readwrite");
+    const store = transaction.objectStore(DB_STORE);
+    const request = store.getAll();
+
+    request.onsuccess = () => {
+      const videos = request.result;
+      videos.forEach((video) => {
+        if (video.matchId === matchId) {
+          store.delete(video.id); // Elimina ogni video associato alla partita
+        }
+      });
+
+      transaction.oncomplete = () => {
+        matchContainer.remove(); // Rimuovi il contenitore della partita dalla pagina
+      };
+    };
+
+    request.onerror = (event) => {
+      console.error(
+        "Errore nell'eliminazione della partita:",
+        event.target.error
+      );
+    };
+  });
+}
 
 function addVideoToPageForVideoSalvati(
   blob,
