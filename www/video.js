@@ -179,8 +179,12 @@ function loadSavedVideos() {
 function addVideoToPage(blob, id, matchState, matchSettings, actionText) {
   const nameP1 = matchSettings.nameP1 || "Pippo";
   const nameP2 = matchSettings.nameP2 || "Pippa";
-  const scoreDisplayPlayer1 = matchState.scoreDisplayPlayer1 || "0";
-  const scoreDisplayPlayer2 = matchState.scoreDisplayPlayer2 || "0";
+  const scoreDisplayPlayer1 = matchState.isTieBreak
+    ? matchState.tieBreakPointsPlayer1
+    : matchState.scoreDisplayPlayer1 || "0";
+  const scoreDisplayPlayer2 = matchState.isTieBreak
+    ? matchState.tieBreakPointsPlayer2
+    : matchState.scoreDisplayPlayer2 || "0";
   const totalGames = matchState.totalGames || "1";
   const currentSetWins = matchState.currentSetWins || 1; // Usa currentSet
 
