@@ -235,12 +235,12 @@ function updateScore(player) {
     updateTieBreakDisplay();
 
     if (
-      tieBreakPointsPlayer1 >= 7 &&
+      tieBreakPointsPlayer1 >= matchSettings.tieBreak &&
       tieBreakPointsPlayer1 - tieBreakPointsPlayer2 >= 2
     ) {
       endTieBreak(1);
     } else if (
-      tieBreakPointsPlayer2 >= 7 &&
+      tieBreakPointsPlayer2 >= matchSettings.tieBreak &&
       tieBreakPointsPlayer2 - tieBreakPointsPlayer1 >= 2
     ) {
       endTieBreak(2);
@@ -718,6 +718,7 @@ newMatch.addEventListener("click", () => {
   localStorage.removeItem("matchFinished");
   localStorage.removeItem("sets");
   localStorage.removeItem("winner");
+  localStorage.removeItem("matchSettings");
 
   // 3. Cancella i video da IndexedDB
   deleteAllVideos(matchId);
@@ -731,7 +732,8 @@ const matchSettings = JSON.parse(localStorage.getItem("matchSettings"));
 
 if (matchSettings) {
   // Usa questi dati nella logica della partita
-  const { nameMatch, nameP1, nameP2, gameCount, setCount } = matchSettings;
+  const { nameMatch, nameP1, nameP2, gameCount, setCount, tieBreak } =
+    matchSettings;
 
   // Puoi aggiornare il display con i nomi
   document.querySelector(".nameMatch").textContent = nameMatch;

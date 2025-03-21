@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("nameP2").value = savedSettings.nameP2 || "";
     document.getElementById("game").value = savedSettings.gameCount || "";
     document.getElementById("set").value = savedSettings.setCount || "";
+    document.getElementById("tieBreak").value = savedSettings.tieBreak || "";
   }
 });
 
@@ -27,10 +28,11 @@ function saveInputData() {
   const nameP2 = document.getElementById("nameP2").value.trim().toUpperCase();
   const gameCount = document.getElementById("game").value;
   const setCount = document.getElementById("set").value;
+  const tieBreak = document.getElementById("tieBreak").value;
 
   localStorage.setItem(
     "matchSettings",
-    JSON.stringify({ nameMatch, nameP1, nameP2, gameCount, setCount })
+    JSON.stringify({ nameMatch, nameP1, nameP2, gameCount, setCount, tieBreak })
   );
 }
 
@@ -40,6 +42,7 @@ document.getElementById("nameP1").addEventListener("input", saveInputData);
 document.getElementById("nameP2").addEventListener("input", saveInputData);
 document.getElementById("game").addEventListener("input", saveInputData);
 document.getElementById("set").addEventListener("input", saveInputData);
+document.getElementById("tieBreak").addEventListener("input", saveInputData);
 
 const startMatchButton = document.getElementById("start-match");
 
@@ -53,9 +56,10 @@ startMatchButton.addEventListener("click", () => {
   const nameP2 = document.getElementById("nameP2").value.trim().toUpperCase();
   const gameCount = document.getElementById("game").value;
   const setCount = document.getElementById("set").value;
+  const tieBreak = document.getElementById("tieBreak").value;
 
   // Verifica che i campi obbligatori siano compilati
-  if (!nameMatch || !nameP1 || !nameP2 || !setCount) {
+  if (!nameMatch || !nameP1 || !nameP2 || !setCount || !tieBreak) {
     alert("Per favore, completa tutti i campi obbligatori.");
     return;
   }
@@ -69,6 +73,7 @@ startMatchButton.addEventListener("click", () => {
       nameP2,
       gameCount: parseInt(gameCount, 10),
       setCount: parseInt(setCount, 10),
+      tieBreak: parseInt(tieBreak, 10),
     })
   );
 

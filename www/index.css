@@ -6,7 +6,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
   margin: 0;
   /* background-image: url("/Images/RegisterSection.jpg"),
     linear-gradient(rgba(0, 0, 0, 0.155), rgba(0, 0, 0, 0)); */
@@ -46,11 +45,15 @@ select {
   width: 100%;
   padding: 10px;
   margin-bottom: 15px;
-  border: none;
+  /* border: none; */
   border-radius: 5px;
   outline: none;
   background-color: #3d3d47;
   color: #fff;
+}
+#set,
+#tieBreak {
+  width: 108%;
 }
 
 input::placeholder {
@@ -64,13 +67,10 @@ form button {
   border-radius: 5px;
   padding: 12px;
   width: 100%;
+  margin-top: 5px;
   margin-left: 10px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-}
-
-form button:hover {
-  background-color: #3700b3;
 }
 
 .back-button {
@@ -87,9 +87,19 @@ form button:hover {
   border-radius: 5px; /* Angoli arrotondati */
   border: 1px solid black;
   text-decoration: none;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
 }
 
 .back-button i {
   margin-right: 8px; /* Distanza tra l'icona e il testo */
+}
+@media screen and (orientation: landscape) {
+  body {
+    overflow-y: auto;
+    min-height: 100vh;
+    align-items: flex-start;
+  }
+  .container {
+    margin-top: 20px; /* Per evitare che sia troppo attaccato in alto */
+  }
 }
