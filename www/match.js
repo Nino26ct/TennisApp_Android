@@ -630,18 +630,58 @@ function resetAll() {
 
 // Ascoltatori eventi per i bottoni dei giocatori
 
-//player1
-btnPlayer1.addEventListener("click", () => updateScore(1));
-btnErrorPlayer1.addEventListener("click", () => updateScore(2));
-btnAce1.addEventListener("click", () => updateScore(1));
-btnAce1.addEventListener("click", () => updateScoreAce(1));
-doubleFaultBtn1.addEventListener("click", () => updateScore(2));
+// Funzione per disabilitare temporaneamente i bottoni del punteggio
+function disableButtonsTemporarily() {
+  const buttons = document.querySelectorAll(
+    ".btn-player1, .btn-erroreP1, .btn-aceP1, .btn-FalloP1, .btn-player2, .btn-erroreP2, .btn-aceP2, .btn-FalloP2"
+  );
+  buttons.forEach((button) => {
+    button.disabled = true;
+  });
+
+  setTimeout(() => {
+    buttons.forEach((button) => {
+      button.disabled = false;
+    });
+  }, 1000); // 1000 millisecondi = 1 secondo
+}
+
+btnPlayer1.addEventListener("click", () => {
+  updateScore(1);
+  disableButtonsTemporarily();
+});
+btnErrorPlayer1.addEventListener("click", () => {
+  updateScore(2);
+  disableButtonsTemporarily();
+});
+btnAce1.addEventListener("click", () => {
+  updateScore(1);
+  updateScoreAce(1);
+  disableButtonsTemporarily();
+});
+doubleFaultBtn1.addEventListener("click", () => {
+  updateScore(2);
+  disableButtonsTemporarily();
+});
+
 //player2
-btnPlayer2.addEventListener("click", () => updateScore(2));
-btnErrorPlayer2.addEventListener("click", () => updateScore(1));
-btnAce2.addEventListener("click", () => updateScore(2));
-btnAce2.addEventListener("click", () => updateScoreAce(2));
-doubleFaultBtn2.addEventListener("click", () => updateScore(1));
+btnPlayer2.addEventListener("click", () => {
+  updateScore(2);
+  disableButtonsTemporarily();
+});
+btnErrorPlayer2.addEventListener("click", () => {
+  updateScore(1);
+  disableButtonsTemporarily();
+});
+btnAce2.addEventListener("click", () => {
+  updateScore(2);
+  updateScoreAce(2);
+  disableButtonsTemporarily();
+});
+doubleFaultBtn2.addEventListener("click", () => {
+  updateScore(1);
+  disableButtonsTemporarily();
+});
 
 linkImp.addEventListener("click", () => {
   localStorage.setItem("gameInProgress", "false");
