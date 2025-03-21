@@ -104,9 +104,7 @@ function startRecording() {
   };
 
   mediaRecorder.onstop = () => {
-    if (!isStoppingCamera) {
-      saveVideo(); // Salva il video solo se non si sta spegnendo la fotocamera
-    }
+    // Rimuovi la chiamata a saveVideo da qui *** // Salva il video solo se non si sta spegnendo la fotocamera
   };
 
   mediaRecorder.start(); // Avvia la registrazione
@@ -114,25 +112,25 @@ function startRecording() {
 }
 
 // Funzione per fermare la registrazione e salvare il video
-function stopAndSaveRecording() {
+function stopAndSaveRecording(actionText) {
   if (isRecording && mediaRecorder.state !== "inactive") {
-    isStoppingCamera = false; // Stiamo fermando la registrazione per salvarla
+    isStoppingCamera = false;
     mediaRecorder.stop();
     isRecording = false;
 
-    // Dopo aver fermato, riparte automaticamente
-    setTimeout(startRecording, 500); // Attendere un attimo e ripartire
+    setTimeout(() => startRecording(), 500); // Riparte la registrazione
+
+    // Salviamo il video con l'azione specifica
+    saveVideo(actionText);
   }
 }
 
 // Funzione per salvare il video
-function saveVideo() {
+function saveVideo(actionText) {
   const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType });
-
-  // Ottieni lo stato del match
   const matchState = JSON.parse(localStorage.getItem("matchState"));
   const matchSettings = JSON.parse(localStorage.getItem("matchSettings"));
-  const matchId = localStorage.getItem("currentMatchId"); // Ottieni l'identificatore della partita corrente
+  const matchId = localStorage.getItem("currentMatchId");
 
   openDB((db) => {
     const transaction = db.transaction(DB_STORE, "readwrite");
@@ -140,13 +138,14 @@ function saveVideo() {
     store.add({
       video: blob,
       matchState: matchState,
-      matchSettings: matchSettings, // Aggiungi lo stato del match
-      matchId: matchId, // Aggiungi l'identificatore della partita
-      hidden: false, // Assicurati che i nuovi video non siano nascosti
+      matchSettings: matchSettings,
+      matchId: matchId,
+      actionText: actionText, // Salva l'azione specifica
+      hidden: false,
     });
 
     transaction.oncomplete = () => {
-      loadSavedVideos(); // Aggiorna la lista dei video sulla pagina
+      loadSavedVideos();
     };
   });
 }
@@ -168,7 +167,8 @@ function loadSavedVideos() {
             data.video,
             data.id,
             data.matchState,
-            data.matchSettings
+            data.matchSettings,
+            data.actionText
           );
         }
       });
@@ -176,7 +176,7 @@ function loadSavedVideos() {
   });
 }
 
-function addVideoToPage(blob, id, matchState, matchSettings, matchContainer) {
+function addVideoToPage(blob, id, matchState, matchSettings, actionText) {
   const nameP1 = matchSettings.nameP1 || "Pippo";
   const nameP2 = matchSettings.nameP2 || "Pippa";
   const scoreDisplayPlayer1 = matchState.scoreDisplayPlayer1 || "0";
@@ -281,6 +281,7 @@ function addVideoToPage(blob, id, matchState, matchSettings, matchContainer) {
     matchInfo.innerHTML = `
       <span>${nameP1} - <span class="scoreDisplayPlayer1">${scoreDisplayPlayer1}</span></span> <span class="vs">VS</span>
       <span>${nameP2} - <span class="scoreDisplayPlayer2">${scoreDisplayPlayer2}</span></span>
+       <span class="action-text">${actionText}</span>
     `;
 
     // Aggiungi icona video alle info
@@ -382,9 +383,43 @@ startCameraButton.addEventListener("click", startCamera);
 // Assegna la funzione `stopAndSaveRecording()` a tutti i pulsanti della partita
 document
   .querySelectorAll(
-    ".btn-player1, .btn-player2, .btn-aceP1, .btn-FalloP1, .btn-erroreP1, .btn-aceP2, .btn-FalloP2, .btn-erroreP2"
+    ".btn-player1, .btn-player2, .btn-aceP1, .btn-FalloP1, .btn-erroreP1, .btn-aceP2, .btn-FalloP2, .btn-erroreP2, .btn-DoppioFalloP1, .btn-DoppioFalloP2"
   )
-  .forEach((button) => button.addEventListener("click", stopAndSaveRecording));
+  .forEach((button) => {
+    button.addEventListener("click", (event) => {
+      let actionText = "";
+      const matchSettings = JSON.parse(localStorage.getItem("matchSettings"));
+      const nameP1 = matchSettings.nameP1 || "Player 1";
+      const nameP2 = matchSettings.nameP2 || "Player 2";
+
+      // Controlla quale bottone è stato premuto
+      if (event.target.classList.contains("btn-player1"))
+        actionText = `Punto: ${nameP1}`;
+      if (event.target.classList.contains("btn-player2"))
+        actionText = `Punto: ${nameP2}`;
+      if (event.target.classList.contains("btn-aceP1"))
+        actionText = `Ace: ${nameP1}`;
+      if (event.target.classList.contains("btn-erroreP1"))
+        actionText = `Errore Forzato: ${nameP1}`;
+      if (event.target.classList.contains("btn-aceP2"))
+        actionText = `Ace: ${nameP2}`;
+      if (event.target.classList.contains("btn-erroreP2"))
+        actionText = `Errore Forzato: ${nameP2}`;
+      if (event.target.classList.contains("btn-FalloP1"))
+        actionText = `Fallo: ${nameP1}`;
+      if (event.target.classList.contains("btn-DoppioFalloP1"))
+        actionText = `Doppio Fallo: ${nameP1}`;
+      if (event.target.classList.contains("btn-FalloP2"))
+        actionText = `Fallo: ${nameP2}`;
+      if (event.target.classList.contains("btn-DoppioFalloP2"))
+        actionText = `Doppio Fallo: ${nameP2}`;
+
+      // Chiama `stopAndSaveRecording` solo se `actionText` è definito e non è un primo fallo
+      if (actionText) {
+        stopAndSaveRecording(actionText);
+      }
+    });
+  });
 
 //Video Salvati ********//
 function loadAllVideos() {
@@ -439,7 +474,8 @@ function loadAllVideos() {
               data.id,
               data.matchState,
               data.matchSettings,
-              matchContainer
+              matchContainer,
+              data.actionText
             );
           });
           savedVideosContainer.appendChild(matchContainer);
@@ -488,7 +524,8 @@ function addVideoToPageForVideoSalvati(
   id,
   matchState,
   matchSettings,
-  matchContainer
+  matchContainer,
+  actionText
 ) {
   const nameP1 = matchSettings.nameP1 || "Pippo";
   const nameP2 = matchSettings.nameP2 || "Pippa";
@@ -591,6 +628,7 @@ function addVideoToPageForVideoSalvati(
     matchInfo.innerHTML = `
           <span>${nameP1} - <span class="scoreDisplayPlayer1">${scoreDisplayPlayer1}</span></span> <span class="vs">VS</span>
           <span>${nameP2} - <span class="scoreDisplayPlayer2">${scoreDisplayPlayer2}</span></span>
+          <span class="action-text">${actionText}</span>
         `;
 
     // Aggiungi icona video alle info

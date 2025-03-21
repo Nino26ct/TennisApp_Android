@@ -182,14 +182,27 @@ doubleFaultBtn1.addEventListener("click", () => {
   falloPointPlayer1++;
   scoreDisplayFallo1.textContent = falloPointPlayer1;
   restoreFaultButton(1);
+
+  const matchSettings = JSON.parse(localStorage.getItem("matchSettings"));
+  const nameP1 = matchSettings.nameP1;
+
+  requestAnimationFrame(() => {
+    stopAndSaveRecording(`Doppio Fallo: ${nameP1}`);
+  });
 });
 
 doubleFaultBtn2.addEventListener("click", () => {
   falloPointPlayer2++;
   scoreDisplayFallo2.textContent = falloPointPlayer2;
   restoreFaultButton(2);
-});
 
+  const matchSettings = JSON.parse(localStorage.getItem("matchSettings"));
+  const nameP2 = matchSettings.nameP2;
+
+  requestAnimationFrame(() => {
+    stopAndSaveRecording(`Doppio Fallo: ${nameP2}`);
+  });
+});
 // Eventi per i pulsanti che annullano "Doppio Fallo" e ripristinano "Fallo"
 btnPlayer1.addEventListener("click", () => restoreFaultButton(1));
 btnAce1.addEventListener("click", () => restoreFaultButton(1));
