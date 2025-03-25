@@ -323,6 +323,11 @@ function updateScoreDisplay() {
     scoreDisplayPlayer1.textContent = tieBreakPointsPlayer1;
     scoreDisplayPlayer2.textContent = tieBreakPointsPlayer2;
   } else {
+    const currentGameCount1 = parseInt(winGame1.textContent, 10);
+    const currentGameCount2 = parseInt(winGame2.textContent, 10);
+    const matchSettings = JSON.parse(localStorage.getItem("matchSettings"));
+    const maxGames = 6;
+
     if (scorePlayer1 === 3 && scorePlayer2 === 3) {
       // Deuce
       if (advantagePlayer === 1) {
@@ -336,30 +341,44 @@ function updateScoreDisplay() {
         scoreDisplayPlayer2.textContent = "40";
       }
     } else if (isDeuceGamePointPlayer1) {
-      // Game Point speciale per deuce (Player 1)
       scoreDisplayPlayer1.textContent = "Game Point (Deuce)";
       scoreDisplayPlayer2.textContent = "40";
       setTimeout(() => {
         showWinningPoint(1);
       }, 500);
     } else if (isDeuceGamePointPlayer2) {
-      // Game Point speciale per deuce (Player 2)
       scoreDisplayPlayer2.textContent = "Game Point (Deuce)";
       scoreDisplayPlayer1.textContent = "40";
       setTimeout(() => {
         showWinningPoint(2);
       }, 500);
     } else if (isGamePointPlayer1) {
-      // Game Point normale (senza deuce)
-      scoreDisplayPlayer1.textContent = "Game Point";
+      // Verifica se è Set Point per il Giocatore 1
+      if (
+        (currentGameCount1 === maxGames - 1 &&
+          currentGameCount1 - currentGameCount2 >= 1) ||
+        (currentGameCount1 >= 6 && currentGameCount1 - currentGameCount2 === 1)
+      ) {
+        scoreDisplayPlayer1.textContent = "Set Point";
+      } else {
+        scoreDisplayPlayer1.textContent = "Game Point";
+      }
       scoreDisplayPlayer2.textContent = tennisScores[scorePlayer2];
 
       setTimeout(() => {
         showWinningPoint(1);
       }, 500);
     } else if (isGamePointPlayer2) {
-      // Game Point normale (senza deuce)
-      scoreDisplayPlayer2.textContent = "Game Point";
+      // Verifica se è Set Point per il Giocatore 2
+      if (
+        (currentGameCount2 === maxGames - 1 &&
+          currentGameCount2 - currentGameCount1 >= 1) ||
+        (currentGameCount2 >= 6 && currentGameCount2 - currentGameCount1 === 1)
+      ) {
+        scoreDisplayPlayer2.textContent = "Set Point";
+      } else {
+        scoreDisplayPlayer2.textContent = "Game Point";
+      }
       scoreDisplayPlayer1.textContent = tennisScores[scorePlayer1];
 
       setTimeout(() => {
@@ -372,6 +391,7 @@ function updateScoreDisplay() {
     }
   }
 }
+
 // Funzione per mostrare il punto vincente e poi incrementare il game
 function showWinningPoint(player) {
   setTimeout(() => {
@@ -631,20 +651,20 @@ function resetAll() {
 // Ascoltatori eventi per i bottoni dei giocatori
 
 // Funzione per disabilitare temporaneamente i bottoni del punteggio
-function disableButtonsTemporarily() {
-  const buttons = document.querySelectorAll(
-    ".btn-player1, .btn-erroreP1, .btn-aceP1, .btn-FalloP1, .btn-player2, .btn-erroreP2, .btn-aceP2, .btn-FalloP2"
-  );
-  buttons.forEach((button) => {
-    button.disabled = true;
-  });
+// function disableButtonsTemporarily() {
+//   const buttons = document.querySelectorAll(
+//     ".btn-player1, .btn-erroreP1, .btn-aceP1, .btn-FalloP1, .btn-player2, .btn-erroreP2, .btn-aceP2, .btn-FalloP2"
+//   );
+//   buttons.forEach((button) => {
+//     button.disabled = true;
+//   });
 
-  setTimeout(() => {
-    buttons.forEach((button) => {
-      button.disabled = false;
-    });
-  }, 1000); // 1000 millisecondi = 1 secondo
-}
+//   setTimeout(() => {
+//     buttons.forEach((button) => {
+//       button.disabled = false;
+//     });
+//   }, 1000); // 1000 millisecondi = 1 secondo
+// }
 
 btnPlayer1.addEventListener("click", () => {
   updateScore(1);
