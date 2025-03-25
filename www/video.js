@@ -83,8 +83,12 @@ async function startCamera() {
 }
 
 // Funzione per avviare la registrazione
-function startRecording() {
+let currentActionText = ""; // Variabile globale per actionText
+
+function startRecording(actionText = "Registrazione") {
+  currentActionText = actionText; // Salva actionText
   let options;
+
   if (MediaRecorder.isTypeSupported("video/webm")) {
     options = { mimeType: "video/webm" };
   } else if (MediaRecorder.isTypeSupported("video/mp4")) {
@@ -94,7 +98,7 @@ function startRecording() {
     return;
   }
 
-  recordedChunks = []; // Reset dei chunk precedenti
+  recordedChunks = [];
   mediaRecorder = new MediaRecorder(stream, options);
 
   mediaRecorder.ondataavailable = (event) => {
@@ -104,24 +108,26 @@ function startRecording() {
   };
 
   mediaRecorder.onstop = () => {
-    // Rimuovi la chiamata a saveVideo da qui *** // Salva il video solo se non si sta spegnendo la fotocamera
+    if (recordedChunks.length === 0) {
+      console.error("Errore: Nessun dato registrato. Il Blob è vuoto.");
+      return;
+    }
+    saveVideo(currentActionText); // Usa la variabile globale
   };
 
-  mediaRecorder.start(); // Avvia la registrazione
+  mediaRecorder.start();
   isRecording = true;
 }
 
 // Funzione per fermare la registrazione e salvare il video
 function stopAndSaveRecording(actionText) {
   if (isRecording && mediaRecorder.state !== "inactive") {
+    currentActionText = actionText; // Passa actionText alla variabile globale
     isStoppingCamera = false;
     mediaRecorder.stop();
     isRecording = false;
 
     setTimeout(() => startRecording(), 500); // Riparte la registrazione
-
-    // Salviamo il video con l'azione specifica
-    saveVideo(actionText);
   }
 }
 
@@ -315,9 +321,12 @@ function openVideoPopup(blob) {
   const popup = document.createElement("div");
   popup.classList.add("video-popup");
 
+  // Creazione dell'URL del video
+  const videoURL = URL.createObjectURL(blob);
+
   // Creazione del video
   const videoElement = document.createElement("video");
-  videoElement.src = URL.createObjectURL(blob);
+  videoElement.src = videoURL;
   videoElement.controls = true;
   videoElement.autoplay = true;
   videoElement.classList.add("popup-video");
@@ -327,7 +336,8 @@ function openVideoPopup(blob) {
   closeButton.textContent = "✖";
   closeButton.classList.add("close-popup");
   closeButton.addEventListener("click", () => {
-    document.body.removeChild(popup);
+    URL.revokeObjectURL(videoURL); // Rilascia la memoria
+    document.body.removeChild(popup); // Rimuove il pop-up
   });
 
   // Aggiungere gli elementi al pop-up

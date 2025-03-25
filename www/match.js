@@ -315,7 +315,6 @@ function updateAceDisplay() {
 
 // Funzione per aggiornare il display
 function updateScoreDisplay() {
-  console.log("Update Score Display chiamato");
   if (isTieBreak) {
     scoreDisplayPlayer1.textContent = tieBreakPointsPlayer1;
     scoreDisplayPlayer2.textContent = tieBreakPointsPlayer2;
@@ -415,8 +414,6 @@ function showWinningPoint(player) {
 }
 
 function showWinningPointDeuce(player) {
-  console.log(`showWinningPointDeuce chiamata per Giocatore ${player}`);
-
   // Mostra la scritta per 500ms
   if (player === 1) {
     scoreDisplayPlayer1.textContent = "Game Point (Deuce)";
