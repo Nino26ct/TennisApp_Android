@@ -251,25 +251,21 @@ function updateScore(player) {
       if (advantagePlayer === null) {
         advantagePlayer = player;
       } else if (advantagePlayer === 1) {
-        // Se il giocatore 1 ha il vantaggio e fa punto, vince
         if (player === 1) {
           isDeuceGamePointPlayer1 = true;
           isDeuceGamePointPlayer2 = false;
-          showWinningPoint(1);
+          showWinningPointDeuce(1);
         } else {
-          // Se il giocatore 2 fa punto, si torna a deuce
           advantagePlayer = null;
           isDeuceGamePointPlayer1 = false;
           isDeuceGamePointPlayer2 = false;
         }
       } else if (advantagePlayer === 2) {
-        // Se il giocatore 2 ha il vantaggio e fa punto, vince
         if (player === 2) {
           isDeuceGamePointPlayer2 = true;
           isDeuceGamePointPlayer1 = false;
-          showWinningPoint(2);
+          showWinningPointDeuce(2);
         } else {
-          // Se il giocatore 1 fa punto, si torna a deuce
           advantagePlayer = null;
           isDeuceGamePointPlayer1 = false;
           isDeuceGamePointPlayer2 = false;
@@ -319,17 +315,47 @@ function updateAceDisplay() {
 
 // Funzione per aggiornare il display
 function updateScoreDisplay() {
+  console.log("Update Score Display chiamato");
   if (isTieBreak) {
     scoreDisplayPlayer1.textContent = tieBreakPointsPlayer1;
     scoreDisplayPlayer2.textContent = tieBreakPointsPlayer2;
   } else {
     const currentGameCount1 = parseInt(winGame1.textContent, 10);
     const currentGameCount2 = parseInt(winGame2.textContent, 10);
-    const matchSettings = JSON.parse(localStorage.getItem("matchSettings"));
     const maxGames = 6;
 
+    // Situazione di Deuce
     if (scorePlayer1 === 3 && scorePlayer2 === 3) {
-      // Deuce
+      if (isDeuceGamePointPlayer1) {
+        // Controlla se è Set Point per il Giocatore 1
+        if (
+          (currentGameCount1 === maxGames - 1 &&
+            currentGameCount1 - currentGameCount2 >= 1) ||
+          (currentGameCount1 >= 6 &&
+            currentGameCount1 - currentGameCount2 === 1)
+        ) {
+          scoreDisplayPlayer1.textContent = "Set Point (Deuce)";
+        } else {
+          scoreDisplayPlayer1.textContent = "Game Point (Deuce)";
+        }
+        scoreDisplayPlayer2.textContent = "40";
+        return; // Evita ulteriori aggiornamenti
+      } else if (isDeuceGamePointPlayer2) {
+        // Controlla se è Set Point per il Giocatore 2
+        if (
+          (currentGameCount2 === maxGames - 1 &&
+            currentGameCount2 - currentGameCount1 >= 1) ||
+          (currentGameCount2 >= 6 &&
+            currentGameCount2 - currentGameCount1 === 1)
+        ) {
+          scoreDisplayPlayer2.textContent = "Set Point (Deuce)";
+        } else {
+          scoreDisplayPlayer2.textContent = "Game Point (Deuce)";
+        }
+        scoreDisplayPlayer1.textContent = "40";
+        return; // Evita ulteriori aggiornamenti
+      }
+
       if (advantagePlayer === 1) {
         scoreDisplayPlayer1.textContent = "Adv";
         scoreDisplayPlayer2.textContent = "40";
@@ -340,18 +366,6 @@ function updateScoreDisplay() {
         scoreDisplayPlayer1.textContent = "40";
         scoreDisplayPlayer2.textContent = "40";
       }
-    } else if (isDeuceGamePointPlayer1) {
-      scoreDisplayPlayer1.textContent = "Game Point (Deuce)";
-      scoreDisplayPlayer2.textContent = "40";
-      setTimeout(() => {
-        showWinningPoint(1);
-      }, 500);
-    } else if (isDeuceGamePointPlayer2) {
-      scoreDisplayPlayer2.textContent = "Game Point (Deuce)";
-      scoreDisplayPlayer1.textContent = "40";
-      setTimeout(() => {
-        showWinningPoint(2);
-      }, 500);
     } else if (isGamePointPlayer1) {
       // Verifica se è Set Point per il Giocatore 1
       if (
@@ -400,6 +414,25 @@ function showWinningPoint(player) {
   }, 500);
 }
 
+function showWinningPointDeuce(player) {
+  console.log(`showWinningPointDeuce chiamata per Giocatore ${player}`);
+
+  // Mostra la scritta per 500ms
+  if (player === 1) {
+    scoreDisplayPlayer1.textContent = "Game Point (Deuce)";
+    scoreDisplayPlayer2.textContent = "40";
+  } else {
+    scoreDisplayPlayer2.textContent = "Game Point (Deuce)";
+    scoreDisplayPlayer1.textContent = "40";
+  }
+
+  // Dopo 500ms incrementa il game
+  setTimeout(() => {
+    incrementGame(player);
+    saveMatchState();
+  }, 500);
+}
+
 // Funzione per aggiornare il display del tie-break
 function updateTieBreakDisplay() {
   scoreDisplayPlayer1.textContent = tieBreakPointsPlayer1;
@@ -408,12 +441,8 @@ function updateTieBreakDisplay() {
 
 // Funzione per incrementare il game
 function incrementGame(player) {
-  // Resetta lo stato del Game Point per il nuovo game
   isGamePointPlayer1 = false;
   isGamePointPlayer2 = false;
-  isDeuceGamePointPlayer1 = false;
-  isDeuceGamePointPlayer2 = false;
-  advantagePlayer = null;
 
   const currentGameCount1 = parseInt(winGame1.textContent, 10);
   const currentGameCount2 = parseInt(winGame2.textContent, 10);
@@ -430,11 +459,17 @@ function incrementGame(player) {
     parseInt(winGame1.textContent, 10) === 6 &&
     parseInt(winGame2.textContent, 10) === 6
   ) {
-    alert("inizio Tie Break");
+    alert("Inizio Tie Break");
     startTieBreak();
   } else {
     checkSetWinner(player);
   }
+
+  // Resetta lo stato del Game Point per il nuovo game solo dopo l'aggiornamento
+  isDeuceGamePointPlayer1 = false;
+  isDeuceGamePointPlayer2 = false;
+  advantagePlayer = null;
+  // Aspetta 500 ms per assicurarti che il display venga aggiornato
 
   scorePlayer1 = 0; // Resetta il punteggio
   scorePlayer2 = 0; // Resetta il punteggio
