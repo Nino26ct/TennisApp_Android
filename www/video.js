@@ -108,6 +108,13 @@ function startRecording(actionText = "Registrazione") {
   };
 
   mediaRecorder.onstop = () => {
+    if (isStoppingCamera) {
+      console.log(
+        "La videocamera è stata fermata. Il video non verrà salvato."
+      );
+      return; // Non salvare il video
+    }
+
     if (recordedChunks.length === 0) {
       console.error("Errore: Nessun dato registrato. Il Blob è vuoto.");
       return;
@@ -408,25 +415,25 @@ document
 
       // Controlla quale bottone è stato premuto
       if (event.target.classList.contains("btn-player1"))
-        actionText = `Punto: ${nameP1}`;
+        actionText = `<span class="actionTextGreen"> Punto: </span> <span> ${nameP1}</span>`;
       if (event.target.classList.contains("btn-player2"))
-        actionText = `Punto: ${nameP2}`;
+        actionText = `<span class="actionTextGreen"> Punto: </span> <span> ${nameP2}</span>`;
       if (event.target.classList.contains("btn-aceP1"))
-        actionText = `Ace: ${nameP1}`;
+        actionText = `<span class="actionTextAzzurro"> Ace: </span> <span> ${nameP1}</span>`;
       if (event.target.classList.contains("btn-erroreP1"))
-        actionText = `Errore Forzato: ${nameP1}`;
+        actionText = `<span class="actionTextRed"> Errore Forzato: </span> <span> ${nameP1}</span>`;
       if (event.target.classList.contains("btn-aceP2"))
-        actionText = `Ace: ${nameP2}`;
+        actionText = `<span class="actionTextAzzurro"> Ace: </span> <span> ${nameP2}</span>`;
       if (event.target.classList.contains("btn-erroreP2"))
-        actionText = `Errore Forzato: ${nameP2}`;
+        actionText = `<span class="actionTextRed"> Errore Forzato: </span> <span> ${nameP2}</span>`;
       if (event.target.classList.contains("btn-FalloP1"))
-        actionText = `Fallo: ${nameP1}`;
+        actionText = `<span class="actionTextRed"> Fallo: </span> <span> ${nameP1}</span>`;
       if (event.target.classList.contains("btn-DoppioFalloP1"))
-        actionText = `Doppio Fallo: ${nameP1}`;
+        actionText = `<span class="actionTextRed"> Doppio Fallo: </span> <span> ${nameP1}</span>`;
       if (event.target.classList.contains("btn-FalloP2"))
-        actionText = `Fallo: ${nameP2}`;
+        actionText = `<span class="actionTextRed"> Fallo: </span> <span> ${nameP2}</span>`;
       if (event.target.classList.contains("btn-DoppioFalloP2"))
-        actionText = `Doppio Fallo: ${nameP2}`;
+        actionText = `<span> Doppio Fallo: </span> <span> ${nameP2}</span>`;
 
       // Chiama `stopAndSaveRecording` solo se `actionText` è definito e non è un primo fallo
       if (actionText) {
@@ -543,8 +550,12 @@ function addVideoToPageForVideoSalvati(
 ) {
   const nameP1 = matchSettings.nameP1 || "Pippo";
   const nameP2 = matchSettings.nameP2 || "Pippa";
-  const scoreDisplayPlayer1 = matchState.scoreDisplayPlayer1 || "0";
-  const scoreDisplayPlayer2 = matchState.scoreDisplayPlayer2 || "0";
+  const scoreDisplayPlayer1 = matchState.isTieBreak
+    ? matchState.tieBreakPointsPlayer1
+    : matchState.scoreDisplayPlayer1 || "0";
+  const scoreDisplayPlayer2 = matchState.isTieBreak
+    ? matchState.tieBreakPointsPlayer2
+    : matchState.scoreDisplayPlayer2 || "0";
   const totalGames = matchState.totalGames || "1";
   const currentSetWins = matchState.currentSetWins || 1;
   const setCount = matchState.setCount || 1; // Usa setCount specifico per ogni partita

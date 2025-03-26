@@ -79,6 +79,8 @@ function saveMatchState() {
     btnErrorPlayer2: btnErrorPlayer2.textContent,
     btnAce2: btnAce2.textContent,
     btnFallo2: btnFallo2.textContent,
+    isDoubleFaultP1: doubleFaultBtn1.parentNode !== null, // Salva se il pulsante "Doppio Fallo" è attivo per Player 1
+    isDoubleFaultP2: doubleFaultBtn2.parentNode !== null, // Salva se il pulsante "Doppio Fallo" è attivo per Player 2
     scoreDisplayPlayer1: scoreDisplayPlayer1.textContent,
     scoreDisplayPlayer2: scoreDisplayPlayer2.textContent,
     totalGames: totalGames,
@@ -107,6 +109,12 @@ function loadMatchState() {
     falloPointPlayer2 = savedState.falloPointPlayer2;
     tieBreakPointsPlayer1 = savedState.tieBreakPointsPlayer1;
     tieBreakPointsPlayer2 = savedState.tieBreakPointsPlayer2;
+    if (savedState.isDoubleFaultP1) {
+      replaceWithDoubleFaultButton(1);
+    }
+    if (savedState.isDoubleFaultP2) {
+      replaceWithDoubleFaultButton(2);
+    }
     advantagePlayer = savedState.advantagePlayer;
     isTieBreak = savedState.isTieBreak;
     totalGames = savedState.totalGames;
@@ -169,12 +177,14 @@ btnFallo1.addEventListener("click", () => {
   falloPointPlayer1++;
   scoreDisplayFallo1.textContent = falloPointPlayer1;
   replaceWithDoubleFaultButton(1);
+  saveMatchState();
 });
 
 btnFallo2.addEventListener("click", () => {
   falloPointPlayer2++;
   scoreDisplayFallo2.textContent = falloPointPlayer2;
   replaceWithDoubleFaultButton(2);
+  saveMatchState();
 });
 
 // Eventi per i pulsanti "Doppio Fallo"
@@ -182,12 +192,14 @@ doubleFaultBtn1.addEventListener("click", () => {
   falloPointPlayer1++;
   scoreDisplayFallo1.textContent = falloPointPlayer1;
   restoreFaultButton(1);
-
+  saveMatchState();
   const matchSettings = JSON.parse(localStorage.getItem("matchSettings"));
   const nameP1 = matchSettings.nameP1;
 
   requestAnimationFrame(() => {
-    stopAndSaveRecording(`Doppio Fallo: ${nameP1}`);
+    stopAndSaveRecording(
+      `<span class="actionTextRed"> Doppio Fallo: </span> <span> ${nameP1}</span>`
+    );
   });
 });
 
@@ -195,12 +207,14 @@ doubleFaultBtn2.addEventListener("click", () => {
   falloPointPlayer2++;
   scoreDisplayFallo2.textContent = falloPointPlayer2;
   restoreFaultButton(2);
-
+  saveMatchState();
   const matchSettings = JSON.parse(localStorage.getItem("matchSettings"));
   const nameP2 = matchSettings.nameP2;
 
   requestAnimationFrame(() => {
-    stopAndSaveRecording(`Doppio Fallo: ${nameP2}`);
+    stopAndSaveRecording(
+      `<span class="actionTextRed"> Doppio Fallo: </span> <span> ${nameP2}</span>`
+    );
   });
 });
 // Eventi per i pulsanti che annullano "Doppio Fallo" e ripristinano "Fallo"
