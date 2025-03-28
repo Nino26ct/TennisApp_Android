@@ -496,7 +496,7 @@ function startTieBreak() {
 
 // Funzione per terminare il tie-break
 function endTieBreak(winner) {
-  isTieBreak = false;
+  // isTieBreak = false;
   const matchSettings = JSON.parse(localStorage.getItem("matchSettings"));
 
   // Usa il numero di set definiti nelle impostazioni della partita
@@ -507,6 +507,8 @@ function endTieBreak(winner) {
   }
 
   updateTieBreakDisplay();
+
+  saveMatchState();
 }
 
 // Funzione per verificare chi ha vinto il set
@@ -559,6 +561,9 @@ function endMatch(winnerName, fromLoad = false) {
   localStorage.setItem("matchFinished", "true");
   localStorage.setItem("winner", winnerName); // Salviamo il vincitore
 
+  // Nascondi il link impostazioni
+  linkImp.style.display = "none";
+
   // Disabilita tutti i pulsanti che incrementano il punteggio
   const buttons = document.querySelectorAll(
     ".btn-player1, .btn-erroreP1, .btn-aceP1, .btn-FalloP1, .btn-player2, .btn-erroreP2, .btn-aceP2, .btn-FalloP2"
@@ -608,6 +613,9 @@ function incrementSet(player, maxSets, matchSettings) {
   const currentSet = {
     player1Games: parseInt(winGame1.textContent, 10),
     player2Games: parseInt(winGame2.textContent, 10),
+    isTieBreak: isTieBreak, // Indica se il set è terminato in tie-break
+    tieBreakPointsPlayer1: tieBreakPointsPlayer1 || 0,
+    tieBreakPointsPlayer2: tieBreakPointsPlayer2 || 0,
   };
 
   let sets = JSON.parse(localStorage.getItem("sets")) || [];
@@ -620,7 +628,6 @@ function incrementSet(player, maxSets, matchSettings) {
     winSet1.textContent = currentSetWins;
 
     if (currentSetWins === setsToWin) {
-      totalGames = "Match Point";
       endMatch(matchSettings.nameP1);
       resetAll();
     } else {
@@ -634,7 +641,6 @@ function incrementSet(player, maxSets, matchSettings) {
     winSet2.textContent = currentSetWins;
 
     if (currentSetWins === setsToWin) {
-      totalGames = "Match Point";
       endMatch(matchSettings.nameP2);
       resetAll();
     } else {
@@ -752,6 +758,7 @@ doubleFaultBtn2.addEventListener("click", () => {
 linkImp.addEventListener("click", () => {
   localStorage.setItem("gameInProgress", "false");
 }); // Imposta a false per indicare che la partita non è in corso})
+
 // Funzione per salvare lo stato della partita finita
 function saveFinishedMatch() {
   const finishedMatchState = {

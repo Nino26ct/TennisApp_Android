@@ -18,13 +18,27 @@ document.addEventListener("DOMContentLoaded", () => {
         } vs ${matchSettings.nameP2 || "Giocatore 2"}</h3>`;
 
         sets.forEach((set, setIndex) => {
-          matchInfo += `<p>Set ${setIndex + 1}: ${
+          let bgColor = setIndex % 2 === 0 ? "#222831" : "#393E46"; // Alterna i colori di sfondo
+          matchInfo += `<div style="background-color: ${bgColor}; padding: 10px; border-radius: 10px; margin: 10px 0;">`;
+          matchInfo += `<p style="color: #EEEEEE;">Set ${setIndex + 1}: ${
             matchSettings.nameP1 || "Giocatore 1"
           } - ${set.player1Games} VS ${
             matchSettings.nameP2 || "Giocatore 2"
-          } - ${set.player2Games}</p>
-          </h3> <h2 style="color: red"> ${match.winner} ha vinto!</h2>`;
+          } - ${set.player2Games}</p>`;
+
+          // Aggiungi il punteggio del tie-break se presente per il set
+          if (set.isTieBreak) {
+            matchInfo += `<p style="color: orange; font-weight: bold;">Tie-Break Set ${
+              setIndex + 1
+            }: ${set.tieBreakPointsPlayer1 || 0} - ${
+              set.tieBreakPointsPlayer2 || 0
+            }</p>`;
+          }
+
+          matchInfo += `</div>`; // Chiusura del div per il set
         });
+
+        matchInfo += `<h2 style="color: red">${match.winner} ha vinto!</h2>`;
         matchInfo += `<button onclick="deleteMatch(${index})">Elimina</button>`;
         matchInfo += "<hr></div>";
       });
