@@ -1,3 +1,12 @@
+// Recupera il colore dal localStorage
+const coloreSalvato = localStorage.getItem("campoColor");
+
+// Se c'è un colore salvato, applicalo al campo
+if (coloreSalvato) {
+  document.getElementById("sezione-punti").style.backgroundColor =
+    coloreSalvato;
+}
+
 //Bottoni del campo
 const btnPlayer1 = document.querySelector(".btn-player1");
 const btnErrorPlayer1 = document.querySelector(".btn-erroreP1");
@@ -835,6 +844,9 @@ newMatch.addEventListener("click", () => {
   localStorage.removeItem("sets");
   localStorage.removeItem("winner");
   localStorage.removeItem("matchSettings");
+
+  // Resetta il colore salvato
+  localStorage.removeItem("campoColor");
 
   // 3. Cancella i video da IndexedDB
   deleteAllVideos(matchId);

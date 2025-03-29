@@ -74,6 +74,29 @@ form button {
   transition: background-color 0.3s ease;
 }
 
+#colore-campo {
+  display: flex;
+  gap: 30px; /* Spaziatura tra i checkbox */
+  color: white;
+}
+
+#colore-campo input[type="radio"] {
+  margin-top: 18px;
+}
+
+#colore-campo label {
+  display: flex;
+  align-items: center; /* Allinea il testo verticalmente con il checkbox */
+}
+
+.color-box {
+  display: inline-block;
+  width: 50px;
+  height: 25px;
+  border: 2px solid white;
+  border-radius: 3px;
+}
+
 .back-button {
   width: 30px;
   background-color: red; /* Colore blu */
@@ -82,18 +105,20 @@ form button {
   padding: 10px 20px; /* Distanze interne */
   font-size: 30px; /* Dimensione del testo */
   cursor: pointer; /* Cambia il cursore al passaggio del mouse */
+
   display: flex;
   align-items: center;
   text-align: center;
   border-radius: 5px; /* Angoli arrotondati */
   border: 1px solid black;
   text-decoration: none;
-  /* margin-bottom: 20px; */
+  margin-bottom: 20px;
 }
 
 .back-button i {
   margin-right: 8px; /* Distanza tra l'icona e il testo */
 }
+
 @media screen and (orientation: landscape) {
   body {
     overflow-y: auto;

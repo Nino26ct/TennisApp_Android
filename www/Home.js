@@ -84,3 +84,13 @@ startMatchButton.addEventListener("click", () => {
   // Reindirizza alla pagina match.html
   window.location.href = "match.html";
 });
+
+document
+  .querySelectorAll('input[name="colore-campo"]')
+  .forEach((input, index) => {
+    input.addEventListener("change", function () {
+      // Trova il colore associato alla color-box corrispondente
+      const colore = input.nextElementSibling.style.backgroundColor;
+      localStorage.setItem("campoColor", colore);
+    });
+  });
