@@ -57,9 +57,19 @@ startMatchButton.addEventListener("click", () => {
   const gameCount = document.getElementById("game").value;
   const setCount = document.getElementById("set").value;
   const tieBreak = document.getElementById("tieBreak").value;
+  const modalitaGioco = document.querySelector(
+    'input[name="modalita-gioco"]:checked'
+  )?.value;
 
   // Verifica che i campi obbligatori siano compilati
-  if (!nameMatch || !nameP1 || !nameP2 || !setCount || !tieBreak) {
+  if (
+    !nameMatch ||
+    !nameP1 ||
+    !nameP2 ||
+    !setCount ||
+    !tieBreak ||
+    !modalitaGioco
+  ) {
     alert("Per favore, completa tutti i campi obbligatori.");
     return;
   }
@@ -74,6 +84,7 @@ startMatchButton.addEventListener("click", () => {
       gameCount: parseInt(gameCount, 10),
       setCount: parseInt(setCount, 10),
       tieBreak: parseInt(tieBreak, 10),
+      modalitaGioco,
     })
   );
 

@@ -7,6 +7,38 @@ if (coloreSalvato) {
     coloreSalvato;
 }
 
+// Funzione per gestire la modalità di gioco
+function handleGameMode() {
+  const matchSettings = JSON.parse(localStorage.getItem("matchSettings"));
+  if (matchSettings) {
+    const modalitaGioco = matchSettings.modalitaGioco;
+
+    // Nascondi tutti i pulsanti inizialmente
+    document.querySelectorAll(".sezione-punti button").forEach((button) => {
+      button.style.display = "none";
+    });
+
+    // Mostra i pulsanti in base alla modalità di gioco
+    if (modalitaGioco === "Lite") {
+      document.querySelector(".btn-player1").style.display = "inline-block";
+      document.querySelector(".btn-player2").style.display = "inline-block";
+    } else if (modalitaGioco === "Standard") {
+      document.querySelector(".btn-player1").style.display = "inline-block";
+      document.querySelector(".btn-player2").style.display = "inline-block";
+      document.querySelector(".btn-erroreP1").style.display = "inline-block";
+      document.querySelector(".btn-erroreP2").style.display = "inline-block";
+    } else if (modalitaGioco === "Pro") {
+      // Mostra tutti i pulsanti
+      document.querySelectorAll(".sezione-punti button").forEach((button) => {
+        button.style.display = "inline-block";
+      });
+    }
+  }
+}
+
+// Chiama la funzione quando la pagina viene caricata
+window.addEventListener("DOMContentLoaded", handleGameMode);
+
 //Bottoni del campo
 const btnPlayer1 = document.querySelector(".btn-player1");
 const btnErrorPlayer1 = document.querySelector(".btn-erroreP1");

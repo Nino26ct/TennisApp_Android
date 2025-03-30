@@ -91,10 +91,25 @@ form button {
 
 .color-box {
   display: inline-block;
-  width: 50px;
-  height: 25px;
+  min-width: 50px;
+  min-height: 25px;
   border: 2px solid white;
   border-radius: 3px;
+}
+
+#modalita-gioco input[type="radio"] {
+  margin-top: 18px;
+}
+
+#modalita-gioco {
+  display: flex;
+  gap: 30px; /* Spaziatura tra i checkbox */
+  color: white;
+}
+
+#modalita-gioco label {
+  display: flex;
+  align-items: center; /* Allinea il testo verticalmente con il checkbox */
 }
 
 .back-button {
