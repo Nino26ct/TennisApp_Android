@@ -95,6 +95,7 @@ form button {
   min-height: 25px;
   border: 2px solid white;
   border-radius: 3px;
+  box-sizing: border-box;
 }
 
 #modalita-gioco input[type="radio"] {
