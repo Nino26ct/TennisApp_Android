@@ -35,11 +35,19 @@ function handleGameMode() {
       if (modalitaGioco === "Lite") {
         document.querySelector(".btn-player1").style.display = "inline-block";
         document.querySelector(".btn-player2").style.display = "inline-block";
+        document.querySelector(".btn-player1").style.top = "45%";
+        document.querySelector(".btn-player2").style.top = "45%";
+        document.querySelector("#sezione-punti").style.height = "15vh";
       } else if (modalitaGioco === "Standard") {
         document.querySelector(".btn-player1").style.display = "inline-block";
         document.querySelector(".btn-player2").style.display = "inline-block";
+        document.querySelector(".btn-player1").style.top = "23%";
+        document.querySelector(".btn-player2").style.top = "23%";
         document.querySelector(".btn-erroreP1").style.display = "inline-block";
         document.querySelector(".btn-erroreP2").style.display = "inline-block";
+        document.querySelector(".btn-erroreP1").style.top = "73%";
+        document.querySelector(".btn-erroreP2").style.top = "73%";
+        document.querySelector("#sezione-punti").style.height = "25vh";
       } else if (modalitaGioco === "Pro") {
         // Mostra tutti i pulsanti
         document.querySelectorAll(".sezione-punti button").forEach((button) => {
