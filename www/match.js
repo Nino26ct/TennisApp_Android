@@ -7,33 +7,59 @@ if (coloreSalvato) {
     coloreSalvato;
 }
 
-// Funzione per gestire la modalità di gioco
+function restoreButtonStates() {
+  const buttonStates = JSON.parse(localStorage.getItem("buttonStates"));
+  if (buttonStates) {
+    buttonStates.forEach((state) => {
+      const button = document.querySelector(`.${state.selector}`);
+      if (button) {
+        button.style.display = state.display;
+      }
+    });
+  }
+}
+
+// Modifica la funzione handleGameMode per chiamare restoreButtonStates
 function handleGameMode() {
   const matchSettings = JSON.parse(localStorage.getItem("matchSettings"));
   if (matchSettings) {
     const modalitaGioco = matchSettings.modalitaGioco;
 
-    // Nascondi tutti i pulsanti inizialmente
-    document.querySelectorAll(".sezione-punti button").forEach((button) => {
-      button.style.display = "none";
-    });
-
-    // Mostra i pulsanti in base alla modalità di gioco
-    if (modalitaGioco === "Lite") {
-      document.querySelector(".btn-player1").style.display = "inline-block";
-      document.querySelector(".btn-player2").style.display = "inline-block";
-    } else if (modalitaGioco === "Standard") {
-      document.querySelector(".btn-player1").style.display = "inline-block";
-      document.querySelector(".btn-player2").style.display = "inline-block";
-      document.querySelector(".btn-erroreP1").style.display = "inline-block";
-      document.querySelector(".btn-erroreP2").style.display = "inline-block";
-    } else if (modalitaGioco === "Pro") {
-      // Mostra tutti i pulsanti
+    // Nascondi tutti i pulsanti solo se necessario
+    if (modalitaGioco) {
       document.querySelectorAll(".sezione-punti button").forEach((button) => {
-        button.style.display = "inline-block";
+        button.style.display = "none";
       });
+
+      // Mostra i pulsanti in base alla modalità di gioco
+      if (modalitaGioco === "Lite") {
+        document.querySelector(".btn-player1").style.display = "inline-block";
+        document.querySelector(".btn-player2").style.display = "inline-block";
+      } else if (modalitaGioco === "Standard") {
+        document.querySelector(".btn-player1").style.display = "inline-block";
+        document.querySelector(".btn-player2").style.display = "inline-block";
+        document.querySelector(".btn-erroreP1").style.display = "inline-block";
+        document.querySelector(".btn-erroreP2").style.display = "inline-block";
+      } else if (modalitaGioco === "Pro") {
+        // Mostra tutti i pulsanti
+        document.querySelectorAll(".sezione-punti button").forEach((button) => {
+          button.style.display = "inline-block";
+        });
+      }
+
+      // Salva lo stato dei pulsanti nel localStorage
+      const buttonStates = Array.from(
+        document.querySelectorAll(".sezione-punti button")
+      ).map((button) => ({
+        selector: button.className,
+        display: button.style.display,
+      }));
+      localStorage.setItem("buttonStates", JSON.stringify(buttonStates));
     }
   }
+
+  // Ripristina lo stato dei pulsanti salvato
+  restoreButtonStates();
 }
 
 // Chiama la funzione quando la pagina viene caricata
