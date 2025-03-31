@@ -8,17 +8,26 @@ if (coloreSalvato) {
 }
 
 function restoreButtonStates() {
-  const buttonStates = JSON.parse(localStorage.getItem("buttonStates"));
-  if (buttonStates) {
-    buttonStates.forEach((state) => {
+  const savedState = JSON.parse(localStorage.getItem("buttonStates"));
+  if (savedState) {
+    const { buttons, sezionePuntiHeight } = savedState;
+
+    // Ripristina lo stato dei bottoni
+    buttons.forEach((state) => {
       const button = document.querySelector(`.${state.selector}`);
       if (button) {
         button.style.display = state.display;
+        button.style.top = state.top;
       }
     });
+
+    // Ripristina la height della sezione punti
+    const sezionePunti = document.querySelector("#sezione-punti");
+    if (sezionePunti) {
+      sezionePunti.style.height = sezionePuntiHeight;
+    }
   }
 }
-
 // Modifica la funzione handleGameMode per chiamare restoreButtonStates
 function handleGameMode() {
   const matchSettings = JSON.parse(localStorage.getItem("matchSettings"));
@@ -61,8 +70,16 @@ function handleGameMode() {
       ).map((button) => ({
         selector: button.className,
         display: button.style.display,
+        top: button.style.top,
+        height: button.style.height,
       }));
-      localStorage.setItem("buttonStates", JSON.stringify(buttonStates));
+      const sezionePuntiHeight =
+        document.querySelector("#sezione-punti").style.height;
+
+      localStorage.setItem(
+        "buttonStates",
+        JSON.stringify({ buttons: buttonStates, sezionePuntiHeight })
+      );
     }
   }
 
