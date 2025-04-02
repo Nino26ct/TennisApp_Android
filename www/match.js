@@ -28,7 +28,12 @@ function restoreButtonStates() {
     }
   }
 }
-// Modifica la funzione handleGameMode per chiamare restoreButtonStates
+// Funzione per verificare l'orientamento dello schermo
+function isLandscape() {
+  return window.innerWidth > window.innerHeight;
+}
+
+// Modifica la funzione handleGameMode per gestire l'orientamento
 function handleGameMode() {
   const matchSettings = JSON.parse(localStorage.getItem("matchSettings"));
   if (matchSettings) {
@@ -46,7 +51,9 @@ function handleGameMode() {
         document.querySelector(".btn-player2").style.display = "inline-block";
         document.querySelector(".btn-player1").style.top = "45%";
         document.querySelector(".btn-player2").style.top = "45%";
-        document.querySelector("#sezione-punti").style.height = "15vh";
+        document.querySelector("#sezione-punti").style.height = isLandscape()
+          ? "25vh"
+          : "15vh";
       } else if (modalitaGioco === "Standard") {
         document.querySelector(".btn-player1").style.display = "inline-block";
         document.querySelector(".btn-player2").style.display = "inline-block";
@@ -56,14 +63,15 @@ function handleGameMode() {
         document.querySelector(".btn-erroreP2").style.display = "inline-block";
         document.querySelector(".btn-erroreP1").style.top = "73%";
         document.querySelector(".btn-erroreP2").style.top = "73%";
-        document.querySelector("#sezione-punti").style.height = "25vh";
+        document.querySelector("#sezione-punti").style.height = isLandscape()
+          ? "43vh"
+          : "25vh";
       } else if (modalitaGioco === "Pro") {
         // Mostra tutti i pulsanti
         document.querySelectorAll(".sezione-punti button").forEach((button) => {
           button.style.display = "inline-block";
         });
       }
-
       // Salva lo stato dei pulsanti nel localStorage
       const buttonStates = Array.from(
         document.querySelectorAll(".sezione-punti button")
@@ -87,8 +95,15 @@ function handleGameMode() {
   restoreButtonStates();
 }
 
-// Chiama la funzione quando la pagina viene caricata
-window.addEventListener("DOMContentLoaded", handleGameMode);
+// Chiama handleGameMode quando il DOM è completamente caricato
+window.addEventListener("DOMContentLoaded", () => {
+  handleGameMode();
+});
+
+// Aggiungi un listener per gestire i cambiamenti di orientamento o dimensione della finestra
+window.addEventListener("resize", () => {
+  handleGameMode();
+});
 
 //Bottoni del campo
 const btnPlayer1 = document.querySelector(".btn-player1");

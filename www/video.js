@@ -66,7 +66,12 @@ mostraNascondiCameraBtn.addEventListener("click", () => {
 async function startCamera() {
   try {
     stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "environment" }, // Apertura videocamera posteriore
+      video: {
+        facingMode: "environment",
+        width: { ideal: 640 }, // Risoluzione più bassa (puoi provare 480 o 360)
+        height: { ideal: 360 },
+        frameRate: { ideal: 15 }, // Frame rate ridotto
+      },
       audio: false,
     });
     videoElement.srcObject = stream;
@@ -104,6 +109,7 @@ function startRecording(actionText = "Registrazione") {
   mediaRecorder.ondataavailable = (event) => {
     if (event.data.size > 0) {
       recordedChunks.push(event.data);
+      console.log(`Chunk registrato: ${event.data.size} byte`);
     }
   };
 
@@ -119,6 +125,15 @@ function startRecording(actionText = "Registrazione") {
       console.error("Errore: Nessun dato registrato. Il Blob è vuoto.");
       return;
     }
+    const totalSize = recordedChunks.reduce(
+      (acc, chunk) => acc + chunk.size,
+      0
+    );
+    console.log(
+      `Dimensione totale del video registrato: ${(totalSize / 1048576).toFixed(
+        2
+      )} MB`
+    );
     saveVideo(currentActionText); // Usa la variabile globale
   };
 
