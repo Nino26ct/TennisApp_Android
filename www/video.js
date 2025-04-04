@@ -1,3 +1,43 @@
+async function saveVideoToDevice(blob, id) {
+  try {
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+
+    reader.onloadend = async function () {
+      const base64String = reader.result.split(",")[1]; // Rimuove il prefisso data URL
+
+      // Ottieni i dettagli dal localStorage o da altre variabili
+      const matchSettings =
+        JSON.parse(localStorage.getItem("matchSettings")) || {};
+      const matchState = JSON.parse(localStorage.getItem("matchState")) || {};
+      const appName = "TennisApp"; // Nome dell'app
+      const matchName = matchSettings.nameMatch || `Match_${id}`;
+      const setNumber = matchState.currentSetWins || 1;
+      const gameNumber = matchState.totalGames || 1;
+
+      // Costruisci il percorso della directory
+      const directoryPath = `${appName}/${matchName}/Set_${setNumber}/Game_${gameNumber}`;
+
+      // Salva il file nella directory specifica
+      await window.Capacitor.Plugins.Filesystem.mkdir({
+        path: directoryPath,
+        directory: "DOCUMENTS",
+        recursive: true, // Crea le directory mancanti
+      });
+
+      await window.Capacitor.Plugins.Filesystem.writeFile({
+        path: `${directoryPath}/video_${id}.mp4`,
+        data: base64String,
+        directory: "DOCUMENTS",
+      });
+
+      alert("Video salvato con successo nella struttura di cartelle!");
+    };
+  } catch (error) {
+    console.error("Errore nel salvataggio del video:", error);
+    alert("Errore nel salvataggio del video");
+  }
+}
 // Variabili per la videocamera
 const videoDiv = document.getElementById("camera-container");
 const videoElement = document.getElementById("camera-view");
@@ -70,7 +110,7 @@ async function startCamera() {
         facingMode: "environment",
         width: { ideal: 640 }, // Risoluzione più bassa (puoi provare 480 o 360)
         height: { ideal: 360 },
-        frameRate: { ideal: 15 }, // Frame rate ridotto
+        frameRate: { ideal: 30 }, // Frame rate ridotto
       },
       audio: false,
     });
@@ -94,12 +134,14 @@ function startRecording(actionText = "Registrazione") {
   currentActionText = actionText; // Salva actionText
   let options;
 
-  if (MediaRecorder.isTypeSupported("video/webm")) {
-    options = { mimeType: "video/webm" };
-  } else if (MediaRecorder.isTypeSupported("video/mp4")) {
-    options = { mimeType: "video/mp4" };
+  // Verifica il supporto per il codec H.264
+  if (MediaRecorder.isTypeSupported("video/mp4;codecs=avc1")) {
+    options = { mimeType: "video/mp4;codecs=avc1" }; // H.264 codec
   } else {
-    console.error("Formato video non supportato dal browser.");
+    console.error("Il codec H.264 non è supportato dal browser.");
+    alert(
+      "Il tuo browser non supporta il formato video richiesto per WhatsApp."
+    );
     return;
   }
 
@@ -673,6 +715,23 @@ function addVideoToPageForVideoSalvati(
 
     // Aggiungi icona video alle info
     matchInfo.appendChild(videoIcon);
+
+    // Aggiungi pulsante di download
+    const downloadButton = document.createElement("button");
+    downloadButton.classList.add("download-button");
+    downloadButton.innerHTML = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 5v14"></path>
+    <polyline points="19 12 12 19 5 12"></polyline>
+    <line x1="5" y1="19" x2="19" y2="19"></line>
+  </svg>
+`;
+
+    downloadButton.addEventListener("click", async () => {
+      await saveVideoToDevice(blob, id);
+    });
+    // Aggiungi pulsante di download alle info
+    matchInfo.appendChild(downloadButton);
 
     // Aggiungi pulsante di eliminazione con icona di cestino
     const deleteButton = document.createElement("button");

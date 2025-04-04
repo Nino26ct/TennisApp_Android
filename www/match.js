@@ -690,16 +690,35 @@ function endMatch(winnerName, fromLoad = false) {
     document.body.appendChild(endMessage);
   }
 
-  endMessage.textContent = `Fine Partita - ${winnerName} ha vinto!`;
+  endMessage.innerHTML = `
+  <p id="winnerMessage" class="winner-message">Fine Partita - ${winnerName} ha vinto!</p>
+  <div id="newGameRequest" class="new-game-request">
+    <p class="new-game-text">Vuoi iniziare una nuova partita?</p>
+    <button id="newGameYes" class="new-game-button yes-button">Sì</button>
+    <button id="newGameNo" class="new-game-button no-button">No</button>
+  </div>
+`;
   endMessage.style.position = "fixed";
   endMessage.style.top = "50%";
   endMessage.style.left = "50%";
   endMessage.style.transform = "translate(-50%, -50%)";
   endMessage.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
-  endMessage.style.color = "white";
+  endMessage.style.color = "yellow";
   endMessage.style.padding = "20px";
   endMessage.style.fontSize = "24px";
   endMessage.style.zIndex = "1000";
+
+  // Aggiungi eventi ai pulsanti
+  document.getElementById("newGameYes").addEventListener("click", () => {
+    newMatch.click(); // Simula un click sul pulsante "newMatch"
+  });
+
+  document.getElementById("newGameNo").addEventListener("click", () => {
+    const newGameRequest = document.getElementById("newGameRequest");
+    if (newGameRequest) {
+      newGameRequest.style.display = "none"; // Nasconde solo la richiesta di nuova partita
+    }
+  });
 
   // Salva lo stato della partita finita solo la prima volta
   if (!fromLoad) {

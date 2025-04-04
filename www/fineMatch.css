@@ -1,0 +1,49 @@
+.end-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 30px;
+  font-size: 24px;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  text-align: center;
+}
+
+.winner-message {
+  font-weight: bold;
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.new-game-request {
+  text-align: center;
+}
+
+.new-game-text {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.new-game-button {
+  padding: 10px 20px;
+  font-size: 18px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin: 0 10px;
+}
+
+.new-game-button.yes-button {
+  background-color: #acacac;
+  color: black;
+}
+
+.new-game-button.no-button {
+  background-color: #acacac;
+  color: black;
+}

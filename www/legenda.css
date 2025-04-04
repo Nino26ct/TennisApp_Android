@@ -35,7 +35,8 @@ h1 {
 }
 
 .btn-green,
-.btn-red {
+.btn-red,
+.btn-ace {
   /* border: none; */
   border-radius: 8px;
   width: 100px;
@@ -48,7 +49,9 @@ h1 {
 .btn-green {
   background-color: #21c44f;
 }
-
+.btn-ace {
+  background-color: #06eee3;
+}
 .btn-red {
   background-color: red;
 }

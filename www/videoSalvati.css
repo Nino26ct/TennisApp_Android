@@ -61,7 +61,7 @@ body {
   align-items: flex-start;
   margin-left: auto; /* Sposta l'icona verso destra */
   margin-right: 5px; /* Aggiungi un margine a destra per ulteriore spostamento */
-  margin-top: -80px !important; /* Sposta l'icona più in alto */
+  margin-top: -140px !important; /* Sposta l'icona più in alto */
 }
 
 .delete-button {
@@ -70,9 +70,19 @@ body {
   align-items: flex-start;
   margin-left: auto; /* Sposta l'icona verso destra */
   margin-right: 11px; /* Aggiungi un margine a destra per ulteriore spostamento */
-  color: black;
+  margin-top: 5px;
+  color: white;
 }
-
+.download-button {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-left: auto; /* Sposta l'icona verso destra */
+  margin-right: 11px; /* Aggiungi un margine a destra per ulteriore spostamento */
+  margin-top: 5px;
+  color: white;
+  background-color: #007bff;
+}
 .hidden {
   display: none;
 }
@@ -159,6 +169,13 @@ body {
   color: red;
 }
 
+.action-text {
+  margin-top: 40px; /* Aggiunge spazio sopra i punti */
+  margin-bottom: -20px;
+  display: block; /* Assicura che il testo sia su una nuova riga */
+  text-align: center; /* Centra il testo, se necessario */
+}
+
 .back-button {
   width: 30px;
   background-color: red; /* Colore blu */
@@ -206,7 +223,7 @@ body {
     align-items: flex-start;
     margin-left: auto; /* Sposta l'icona verso destra */
     margin-right: 160px; /* Aggiungi un margine a destra per ulteriore spostamento */
-    margin-top: -80px !important; /* Sposta l'icona più in alto */
+    margin-top: -140px !important; /* Sposta l'icona più in alto */
   }
 
   .delete-button {
@@ -215,5 +232,16 @@ body {
     align-items: flex-start;
     margin-left: auto; /* Sposta l'icona verso destra */
     margin-right: 165px; /* Aggiungi un margine a destra per ulteriore spostamento */
+    margin-top: 5px;
+  }
+  .download-button {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-left: auto; /* Sposta l'icona verso destra */
+    margin-right: 165px;
+    margin-top: 5px; /* Aggiungi un margine a destra per ulteriore spostamento */
+    color: white;
+    background-color: #007bff;
   }
 }
