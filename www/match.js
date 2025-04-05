@@ -703,8 +703,10 @@ function endMatch(winnerName, fromLoad = false) {
   endMessage.style.left = "50%";
   endMessage.style.transform = "translate(-50%, -50%)";
   endMessage.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
-  endMessage.style.color = "yellow";
-  endMessage.style.padding = "20px";
+  endMessage.style.color = "white";
+  endMessage.style.paddingBottom = "30px";
+  endMessage.style.paddingLeft = "15px";
+  endMessage.style.width = "70%";
   endMessage.style.fontSize = "24px";
   endMessage.style.zIndex = "1000";
 
