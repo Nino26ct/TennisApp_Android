@@ -16,6 +16,37 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("set").value = savedSettings.setCount || "";
     document.getElementById("tieBreak").value = savedSettings.tieBreak || "";
   }
+
+  // Alterna tra i form "Nuova Partita" e "Allenamento"
+  const buttons = document.querySelectorAll(".top-button");
+  const buttonNewMatch = document.getElementById("buttonTop-newMatch");
+  const buttonAllenamento = document.getElementById("buttonTop-allenamento");
+  const h2 = document.querySelector("h2");
+  const matchLabel = document.querySelector('label[for="impNomeMatch"]');
+  const startMatchButton = document.getElementById("start-match");
+
+  // Funzione per gestire l'evidenziazione
+  function highlightButton(button) {
+    buttons.forEach((btn) => btn.classList.remove("active")); // Rimuovi la classe 'active' da tutti i bottoni
+    button.classList.add("active"); // Aggiungi la classe 'active' al bottone cliccato
+  }
+
+  // Imposta "Nuova Partita" come selezionato all'apertura
+  highlightButton(buttonNewMatch);
+
+  buttonNewMatch.addEventListener("click", function () {
+    highlightButton(buttonNewMatch); // Evidenzia il bottone "Nuova Partita"
+    h2.textContent = "Nuova Partita";
+    matchLabel.textContent = "Match";
+    startMatchButton.textContent = "Avvia Partita";
+  });
+
+  buttonAllenamento.addEventListener("click", function () {
+    highlightButton(buttonAllenamento); // Evidenzia il bottone "Allenamento"
+    h2.textContent = "Allenamento";
+    matchLabel.textContent = "Training";
+    startMatchButton.textContent = "Avvia Allenamento";
+  });
 });
 
 // Funzione per salvare i dati mentre vengono inseriti
@@ -92,6 +123,12 @@ startMatchButton.addEventListener("click", () => {
   localStorage.setItem("gameInProgress", "true");
   localStorage.removeItem("matchFinished");
 
+  // Controlla se il bottone è impostato su "Avvia Allenamento"
+  if (startMatchButton.textContent === "Avvia Allenamento") {
+    localStorage.setItem("isTieBreak", "true"); // Imposta il tie-break
+  } else {
+    localStorage.removeItem("isTieBreak"); // Rimuovi il tie-break per la modalità normale
+  }
   // Reindirizza alla pagina match.html
   window.location.href = "match.html";
 });

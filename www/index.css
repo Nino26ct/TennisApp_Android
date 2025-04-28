@@ -26,7 +26,7 @@ body {
   padding: 40px;
   border-radius: 10px;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
-  width: 300px;
+  width: 400px;
   text-align: center;
 }
 
@@ -135,6 +135,39 @@ form button {
   margin-right: 8px; /* Distanza tra l'icona e il testo */
 }
 
+.button-container {
+  display: flex;
+  justify-content: center;
+  position: absolute; /* Posizionamento assoluto per sovrapporli al container */
+  top: 0; /* Posiziona i bottoni in cima al container */
+  left: 50%; /* Centra i bottoni orizzontalmente */
+  transform: translateX(-50%); /* Corregge il centraggio */
+  z-index: 1; /* Porta i bottoni sopra il container */
+  width: 100%; /* I bottoni occupano tutta la larghezza del container */
+}
+
+.top-button {
+  background-color: #1c1c24; /* Stesso colore del container */
+  color: #bcbcbc; /* Stesso colore del testo */
+  border: none;
+  border-radius: 10px 10px 0 0; /* Arrotonda solo la parte superiore */
+  padding: 10px 0; /* Riduce l'altezza dei bottoni */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 150px; /* Ogni bottone occupa metà della larghezza */
+  box-shadow: none; /* Rimuove l'ombra */
+  margin: 0; /* Rimuove margini */
+  margin-top: 80px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.top-button.active {
+  transform: scale(1.4); /* Ingrandisce il bottone */
+  transition: transform 0.2s ease; /* Aggiunge una transizione fluida */
+  color: #f3ef16;
+}
+
 @media screen and (orientation: landscape) {
   body {
     overflow-y: auto;
@@ -142,6 +175,21 @@ form button {
     align-items: flex-start;
   }
   .container {
-    margin-top: 20px; /* Per evitare che sia troppo attaccato in alto */
+    margin-top: 60px; /* Per evitare che sia troppo attaccato in alto */
+  }
+
+  .top-button {
+    background-color: #1c1c24; /* Stesso colore del container */
+    border: none;
+    border-radius: 10px 10px 0 0; /* Arrotonda solo la parte superiore */
+    padding: 10px 0; /* Riduce l'altezza dei bottoni */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 150px; /* Ogni bottone occupa metà della larghezza */
+    box-shadow: none; /* Rimuove l'ombra */
+    margin: 0; /* Rimuove margini */
+    margin-top: 30px;
+    margin-left: 30px;
+    margin-right: 30px;
   }
 }

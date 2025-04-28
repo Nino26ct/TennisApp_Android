@@ -151,13 +151,45 @@ let isDeuceGamePointPlayer1 = false;
 let isDeuceGamePointPlayer2 = false;
 
 window.onload = function () {
-  loadMatchState();
-  updateScoreDisplay(); // Carica lo stato salvato
+  loadMatchState(); // Carica lo stato salvato
+  updateScoreDisplay(); // Aggiorna il display del punteggio
 
   // Imposta che il gioco è in corso se non è già stato fatto
   if (localStorage.getItem("gameInProgress") !== "true") {
-    // Se la partita non è in corso, impostala come "in corso"
     localStorage.setItem("gameInProgress", "true");
+  }
+
+  // Ripristina lo stato del tie-break
+  const savedState = JSON.parse(localStorage.getItem("matchState"));
+  const isTrainingMode = localStorage.getItem("isTieBreak") === "true"; // Verifica se è modalità allenamento
+
+  if (isTrainingMode) {
+    // Modalità Allenamento
+    if (
+      savedState &&
+      savedState.tieBreakPointsPlayer1 !== undefined &&
+      savedState.tieBreakPointsPlayer2 !== undefined
+    ) {
+      // Ripristina i punti del tie-break se salvati
+      isTieBreak = true;
+      tieBreakPointsPlayer1 = savedState.tieBreakPointsPlayer1 || 0;
+      tieBreakPointsPlayer2 = savedState.tieBreakPointsPlayer2 || 0;
+      updateTieBreakDisplay(); // Aggiorna il display del tie-break
+    } else {
+      // Avvia il tie-break se non ci sono punti salvati
+      startTieBreak();
+    }
+  } else {
+    // Modalità Partita Normale
+    if (savedState && savedState.isTieBreak) {
+      isTieBreak = true;
+      tieBreakPointsPlayer1 = savedState.tieBreakPointsPlayer1 || 0;
+      tieBreakPointsPlayer2 = savedState.tieBreakPointsPlayer2 || 0;
+      updateTieBreakDisplay(); // Aggiorna il display del tie-break
+    } else {
+      isTieBreak = false;
+      updateScoreDisplay(); // Assicurati che il display sia aggiornato
+    }
   }
 };
 
@@ -765,6 +797,11 @@ function incrementSet(player, maxSets, matchSettings) {
       totalGames = 1;
       totalSet++;
       resetGameAndPoints();
+
+      // Attiva il tie-break per il nuovo set solo se siamo in allenamento
+      if (localStorage.getItem("isTieBreak") === "true") {
+        startTieBreak();
+      }
     }
   } else if (player === 2) {
     let currentSetWins = parseInt(winSet2.textContent, 10);
@@ -778,6 +815,11 @@ function incrementSet(player, maxSets, matchSettings) {
       totalGames = 1;
       totalSet++;
       resetGameAndPoints();
+
+      // Attiva il tie-break per il nuovo set solo se siamo in allenamento
+      if (localStorage.getItem("isTieBreak") === "true") {
+        startTieBreak();
+      }
     }
   }
 }
@@ -834,20 +876,20 @@ function resetAll() {
 // Ascoltatori eventi per i bottoni dei giocatori
 
 // Funzione per disabilitare temporaneamente i bottoni del punteggio
-function disableButtonsTemporarily() {
-  const buttons = document.querySelectorAll(
-    ".btn-player1, .btn-erroreP1, .btn-aceP1, .btn-FalloP1, .btn-player2, .btn-erroreP2, .btn-aceP2, .btn-FalloP2"
-  );
-  buttons.forEach((button) => {
-    button.disabled = true;
-  });
+// function disableButtonsTemporarily() {
+//   const buttons = document.querySelectorAll(
+//     ".btn-player1, .btn-erroreP1, .btn-aceP1, .btn-FalloP1, .btn-player2, .btn-erroreP2, .btn-aceP2, .btn-FalloP2"
+//   );
+//   buttons.forEach((button) => {
+//     button.disabled = true;
+//   });
 
-  setTimeout(() => {
-    buttons.forEach((button) => {
-      button.disabled = false;
-    });
-  }, 1000); // 1000 millisecondi = 1 secondo
-}
+//   setTimeout(() => {
+//     buttons.forEach((button) => {
+//       button.disabled = false;
+//     });
+//   }, 1000); // 1000 millisecondi = 1 secondo
+// }
 
 btnPlayer1.addEventListener("click", () => {
   updateScore(1);

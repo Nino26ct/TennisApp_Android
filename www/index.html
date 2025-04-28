@@ -14,11 +14,16 @@
     <!-- Sezione con l'immagine di background -->
     <div class="section"></div>
 
+    <div class="button-container">
+        <button class="top-button active" id="buttonTop-newMatch">Nuova Partita </button>
+        <button class="top-button" id="buttonTop-allenamento">Allenamento</button>
+    </div>
+
     <div class="container">
-        <h2> Nuova Partita </h2>
+
 
         <form id="impostazioni">
-
+            <h2> Nuova Partita </h2>
             <label for="impNomeMatch"> Match</label>
             <input type="text" id="nameMatch" name="nameMatch" placeholder="Nome Partita" required>
 
@@ -80,7 +85,7 @@
                 </label>
             </div>
 
-            <button type="button" id="start-match">Avvia Match</button>
+            <button type="button" id="start-match">Avvia Partita</button>
         </form>
     </div>
     <script src="Home.js"></script>
