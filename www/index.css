@@ -26,7 +26,8 @@ body {
   padding: 40px;
   border-radius: 10px;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
-  width: 400px;
+  width: 300px;
+  margin-top: 30px;
   text-align: center;
 }
 
@@ -138,28 +139,25 @@ form button {
 .button-container {
   display: flex;
   justify-content: center;
-  position: absolute; /* Posizionamento assoluto per sovrapporli al container */
-  top: 0; /* Posiziona i bottoni in cima al container */
-  left: 50%; /* Centra i bottoni orizzontalmente */
-  transform: translateX(-50%); /* Corregge il centraggio */
-  z-index: 1; /* Porta i bottoni sopra il container */
-  width: 100%; /* I bottoni occupano tutta la larghezza del container */
+  align-items: center; /* Centra verticalmente i bottoni */
+  width: 100%;
+  padding: 10px; /* Spaziatura interna */
+  margin-top: -80px; /* Spaziatura dall'alto */
+  box-sizing: border-box; /* Include padding nel calcolo della larghezza */
 }
 
 .top-button {
-  background-color: #1c1c24; /* Stesso colore del container */
-  color: #bcbcbc; /* Stesso colore del testo */
+  background-color: #1c1c24;
+  color: #bcbcbc;
   border: none;
-  border-radius: 10px 10px 0 0; /* Arrotonda solo la parte superiore */
-  padding: 10px 0; /* Riduce l'altezza dei bottoni */
+  border-radius: 10px;
+  padding: 0.8em 0; /* Altezza relativa */
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  width: 150px; /* Ogni bottone occupa metà della larghezza */
-  box-shadow: none; /* Rimuove l'ombra */
-  margin: 0; /* Rimuove margini */
-  margin-top: 80px;
-  margin-left: 20px;
-  margin-right: 20px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  width: 150px; /* Ogni bottone occupa il 45% della larghezza del container */
+  margin: 0 6.5%; /* Spaziatura orizzontale tra i bottoni */
+  box-shadow: none;
+  text-align: center;
 }
 
 .top-button.active {
@@ -178,18 +176,45 @@ form button {
     margin-top: 60px; /* Per evitare che sia troppo attaccato in alto */
   }
 
+  .button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Centra verticalmente i bottoni */
+    width: 100%;
+    padding: 10px; /* Spaziatura interna */
+    margin-top: -80px; /* Spaziatura dall'alto */
+    box-sizing: border-box; /* Include padding nel calcolo della larghezza */
+  }
+
   .top-button {
-    background-color: #1c1c24; /* Stesso colore del container */
+    background-color: #1c1c24;
+    color: #bcbcbc;
     border: none;
-    border-radius: 10px 10px 0 0; /* Arrotonda solo la parte superiore */
-    padding: 10px 0; /* Riduce l'altezza dei bottoni */
+    border-radius: 10px;
+    padding: 0.8em 0; /* Altezza relativa */
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    width: 150px; /* Ogni bottone occupa metà della larghezza */
-    box-shadow: none; /* Rimuove l'ombra */
-    margin: 0; /* Rimuove margini */
-    margin-top: 30px;
-    margin-left: 30px;
-    margin-right: 30px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 150px; /* Ogni bottone occupa il 45% della larghezza del container */
+    margin: 0 6.5%; /* Spaziatura orizzontale tra i bottoni */
+    box-shadow: none;
+    text-align: center;
+  }
+}
+
+@media screen and (max-height: 780px) {
+  .container {
+    margin-top: 80px; /* Per evitare che sia troppo attaccato in alto */
+  }
+}
+
+@media screen and (max-height: 690px) {
+  .container {
+    margin-top: 120px; /* Per evitare che sia troppo attaccato in alto */
+  }
+}
+
+@media screen and (max-height: 655px) {
+  .container {
+    margin-top: 160px; /* Per evitare che sia troppo attaccato in alto */
   }
 }
