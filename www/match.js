@@ -149,6 +149,7 @@ let isGamePointPlayer1 = false;
 let isGamePointPlayer2 = false;
 let isDeuceGamePointPlayer1 = false;
 let isDeuceGamePointPlayer2 = false;
+let historyStack = [];
 
 window.onload = function () {
   loadMatchState(); // Carica lo stato salvato
@@ -272,6 +273,197 @@ function loadMatchState() {
   }
 }
 
+function saveState() {
+  const currentState = {
+    scorePlayer1,
+    scorePlayer2,
+    isGamePointPlayer1,
+    isGamePointPlayer2,
+    isDeuceGamePointPlayer1,
+    isDeuceGamePointPlayer2,
+    advantagePlayer,
+    acePointPlayer1, // Aggiunto
+    acePointPlayer2,
+    falloPointPlayer1,
+    falloPointPlayer2,
+    winGame1: parseInt(winGame1.textContent, 10), // Salva il numero di game vinti dal Player 1
+    winGame2: parseInt(winGame2.textContent, 10), // Salva il numero di game vinti dal Player 2
+    winSet1: parseInt(winSet1.textContent, 10), // Salva il numero di set vinti dal Player 1
+    winSet2: parseInt(winSet2.textContent, 10), // Salva il numero di set vinti dal Player 2
+    tieBreakPointsPlayer1,
+    tieBreakPointsPlayer2,
+    isDoubleFaultP1: doubleFaultBtn1.parentNode !== null, // Aggiunto
+    isDoubleFaultP2: doubleFaultBtn2.parentNode !== null, // Aggiunto
+    isTieBreak,
+  };
+  historyStack.push(currentState);
+}
+
+let skipNextRecording = false; // Flag per saltare la registrazione del prossimo video
+
+function undoLastAction() {
+  if (historyStack.length > 0) {
+    const previousState = historyStack.pop();
+    if (isRecording) {
+      skipNextRecording = true;
+    } // Flag per saltare la registrazione del prossimo video
+
+    // Se siamo in tie-break, ripristina i punti del tie-break
+    if (isTieBreak) {
+      tieBreakPointsPlayer1 = previousState.tieBreakPointsPlayer1;
+      tieBreakPointsPlayer2 = previousState.tieBreakPointsPlayer2;
+
+      // Aggiorna il display del tie-break
+      updateTieBreakDisplay();
+    }
+
+    // Se l'ultima azione è stata un incremento del set, ripristina il punteggio
+    if (
+      parseInt(winSet1.textContent, 10) > previousState.winSet1 ||
+      parseInt(winSet2.textContent, 10) > previousState.winSet2
+    ) {
+      // Decrementa il numero di set vinti
+      winSet1.textContent = previousState.winSet1;
+      winSet2.textContent = previousState.winSet2;
+
+      // Ripristina il punteggio dei game e dei punti
+      winGame1.textContent = previousState.winGame1;
+      winGame2.textContent = previousState.winGame2;
+      scorePlayer1 = previousState.scorePlayer1;
+      scorePlayer2 = previousState.scorePlayer2;
+      isGamePointPlayer1 = previousState.isGamePointPlayer1;
+      isGamePointPlayer2 = previousState.isGamePointPlayer2;
+      isDeuceGamePointPlayer1 = previousState.isDeuceGamePointPlayer1;
+      isDeuceGamePointPlayer2 = previousState.isDeuceGamePointPlayer2;
+      advantagePlayer = previousState.advantagePlayer;
+
+      // Ripristina lo stato del pulsante "Doppio Fallo"
+      if (previousState.isDoubleFaultP1) {
+        replaceWithDoubleFaultButton(1);
+      } else {
+        restoreFaultButton(1);
+      }
+
+      if (previousState.isDoubleFaultP2) {
+        replaceWithDoubleFaultButton(2);
+      } else {
+        restoreFaultButton(2);
+      }
+
+      totalSet--; // Decrementa il contatore dei set
+
+      // Aggiorna i display
+      updateScoreDisplay();
+      updateFalloDisplay();
+      updateAceDisplay();
+      saveMatchState(); // Salva lo stato aggiornato
+
+      // Mostra un messaggio di notifica
+      alert("AZIONE ANNULLATA PER PROSEGUIRE ESEGUIRE L'AZIONE CORRETTA");
+      return;
+    }
+
+    // Se siamo in tie-break, ripristina i punti del tie-break
+    if (isTieBreak) {
+      tieBreakPointsPlayer1 = previousState.tieBreakPointsPlayer1;
+      tieBreakPointsPlayer2 = previousState.tieBreakPointsPlayer2;
+
+      // Aggiorna il display del tie-break
+      updateTieBreakDisplay();
+    }
+    // Se l'ultima azione è stata un incremento del game, ripristina il punteggio
+    if (
+      parseInt(winGame1.textContent, 10) > previousState.winGame1 ||
+      parseInt(winGame2.textContent, 10) > previousState.winGame2
+    ) {
+      // Decrementa il numero di game vinti
+      winGame1.textContent = previousState.winGame1;
+      winGame2.textContent = previousState.winGame2;
+
+      // Ripristina il punteggio precedente
+      scorePlayer1 = previousState.scorePlayer1;
+      scorePlayer2 = previousState.scorePlayer2;
+      isGamePointPlayer1 = previousState.isGamePointPlayer1;
+      isGamePointPlayer2 = previousState.isGamePointPlayer2;
+      isDeuceGamePointPlayer1 = previousState.isDeuceGamePointPlayer1;
+      isDeuceGamePointPlayer2 = previousState.isDeuceGamePointPlayer2;
+      advantagePlayer = previousState.advantagePlayer;
+
+      // Ripristina lo stato del pulsante "Doppio Fallo"
+      if (previousState.isDoubleFaultP1) {
+        replaceWithDoubleFaultButton(1);
+      } else {
+        restoreFaultButton(1);
+      }
+
+      if (previousState.isDoubleFaultP2) {
+        replaceWithDoubleFaultButton(2);
+      } else {
+        restoreFaultButton(2);
+      }
+
+      // Decrementa il contatore dei game
+      totalGames--;
+
+      // Aggiorna i display
+      updateScoreDisplay();
+      updateFalloDisplay();
+      updateAceDisplay();
+      saveMatchState(); // Salva lo stato aggiornato
+
+      // Mostra un messaggio di notifica
+      alert("AZIONE ANNULLATA PER PROSEGUIRE ESEGUIRE L'AZIONE CORRETTA");
+      return;
+    }
+
+    // Se siamo in tie-break, ripristina i punti del tie-break
+    if (isTieBreak) {
+      tieBreakPointsPlayer1 = previousState.tieBreakPointsPlayer1;
+      tieBreakPointsPlayer2 = previousState.tieBreakPointsPlayer2;
+
+      // Aggiorna il display del tie-break
+      updateTieBreakDisplay();
+    }
+
+    // Ripristina lo stato precedente
+    scorePlayer1 = previousState.scorePlayer1;
+    scorePlayer2 = previousState.scorePlayer2;
+    isGamePointPlayer1 = previousState.isGamePointPlayer1;
+    isGamePointPlayer2 = previousState.isGamePointPlayer2;
+    isDeuceGamePointPlayer1 = previousState.isDeuceGamePointPlayer1;
+    isDeuceGamePointPlayer2 = previousState.isDeuceGamePointPlayer2;
+    advantagePlayer = previousState.advantagePlayer;
+    acePointPlayer1 = previousState.acePointPlayer1;
+    acePointPlayer2 = previousState.acePointPlayer2;
+    falloPointPlayer1 = previousState.falloPointPlayer1;
+    falloPointPlayer2 = previousState.falloPointPlayer2;
+
+    // Ripristina lo stato del pulsante "Doppio Fallo"
+    if (previousState.isDoubleFaultP1) {
+      replaceWithDoubleFaultButton(1);
+    } else {
+      restoreFaultButton(1);
+    }
+
+    if (previousState.isDoubleFaultP2) {
+      replaceWithDoubleFaultButton(2);
+    } else {
+      restoreFaultButton(2);
+    }
+
+    // Aggiorna i display
+    updateScoreDisplay();
+    updateFalloDisplay();
+    updateAceDisplay();
+    saveMatchState(); // Salva lo stato aggiornato
+
+    // Mostra un messaggio di notifica
+    alert("AZIONE ANNULLATA PER PROSEGUIRE ESEGUIRE L'AZIONE CORRETTA");
+  } else {
+    alert("Nessuna azione da annullare!");
+  }
+}
+
 //DOPPIO FALLO
 
 function updateFalloDisplay() {
@@ -313,6 +505,7 @@ function replaceWithDoubleFaultButton(player) {
 
 // Eventi per il pulsante "Fallo" di entrambi i giocatori
 btnFallo1.addEventListener("click", () => {
+  saveState();
   falloPointPlayer1++;
   scoreDisplayFallo1.textContent = falloPointPlayer1;
   replaceWithDoubleFaultButton(1);
@@ -320,6 +513,7 @@ btnFallo1.addEventListener("click", () => {
 });
 
 btnFallo2.addEventListener("click", () => {
+  saveState();
   falloPointPlayer2++;
   scoreDisplayFallo2.textContent = falloPointPlayer2;
   replaceWithDoubleFaultButton(2);
@@ -328,6 +522,7 @@ btnFallo2.addEventListener("click", () => {
 
 // Eventi per i pulsanti "Doppio Fallo"
 doubleFaultBtn1.addEventListener("click", () => {
+  // saveState();
   falloPointPlayer1++;
   scoreDisplayFallo1.textContent = falloPointPlayer1;
   restoreFaultButton(1);
@@ -343,6 +538,7 @@ doubleFaultBtn1.addEventListener("click", () => {
 });
 
 doubleFaultBtn2.addEventListener("click", () => {
+  // saveState();
   falloPointPlayer2++;
   scoreDisplayFallo2.textContent = falloPointPlayer2;
   restoreFaultButton(2);
@@ -363,6 +559,7 @@ btnErrorPlayer1.addEventListener("click", () => restoreFaultButton(1));
 btnPlayer2.addEventListener("click", () => restoreFaultButton(2));
 btnErrorPlayer2.addEventListener("click", () => restoreFaultButton(2));
 btnAce2.addEventListener("click", () => restoreFaultButton(2));
+document.getElementById("undoButton").addEventListener("click", undoLastAction);
 
 // funziona per aggiornare punteggio degli ace
 function updateScoreAce(player) {
@@ -377,6 +574,8 @@ function updateScoreAce(player) {
 
 // Funzione per aggiornare il punteggio
 function updateScore(player) {
+  saveState();
+
   if (isTieBreak) {
     // Gestione del tie-break
     if (player === 1) {

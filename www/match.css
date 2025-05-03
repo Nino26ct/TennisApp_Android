@@ -418,6 +418,15 @@ hr {
   box-sizing: border-box;
 }
 
+#undoButton {
+  background-color: #f0f0f0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+  margin-top: 10px;
+}
+
 @media screen and (orientation: landscape) {
   #camera-view {
     width: 90%;

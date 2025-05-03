@@ -34,7 +34,7 @@ async function saveVideoToDevice(blob, id) {
       alert("Video salvato con successo nella struttura di cartelle!");
     };
   } catch (error) {
-    console.error("Errore nel salvataggio del video:", error);
+    // console.error("Errore nel salvataggio del video:", error);
     alert("Errore nel salvataggio del video");
   }
 }
@@ -73,7 +73,7 @@ function openDB(callback) {
   };
 
   request.onerror = (event) => {
-    console.error("Errore IndexedDB:", event.target.errorCode);
+    // console.error("Errore IndexedDB:", event.target.errorCode);
   };
 }
 
@@ -121,7 +121,7 @@ async function startCamera() {
 
     startRecording(); // Avvia automaticamente la registrazione
   } catch (error) {
-    console.error("Errore nell'accesso alla videocamera:", error);
+    // console.error("Errore nell'accesso alla videocamera:", error);
     cameraError.style.display = "block";
     cameraError.textContent = "Errore: " + error.message;
   }
@@ -138,7 +138,7 @@ function startRecording(actionText = "Registrazione") {
   if (MediaRecorder.isTypeSupported("video/mp4;codecs=avc1")) {
     options = { mimeType: "video/mp4;codecs=avc1" }; // H.264 codec
   } else {
-    console.error("Il codec H.264 non è supportato dal browser.");
+    // console.error("Il codec H.264 non è supportato dal browser.");
     alert(
       "Il tuo browser non supporta il formato video richiesto per WhatsApp."
     );
@@ -151,31 +151,31 @@ function startRecording(actionText = "Registrazione") {
   mediaRecorder.ondataavailable = (event) => {
     if (event.data.size > 0) {
       recordedChunks.push(event.data);
-      console.log(`Chunk registrato: ${event.data.size} byte`);
+      // console.log(`Chunk registrato: ${event.data.size} byte`);
     }
   };
 
   mediaRecorder.onstop = () => {
     if (isStoppingCamera) {
-      console.log(
-        "La videocamera è stata fermata. Il video non verrà salvato."
-      );
+      // console.log(
+      //   "La videocamera è stata fermata. Il video non verrà salvato."
+      // );
       return; // Non salvare il video
     }
 
     if (recordedChunks.length === 0) {
-      console.error("Errore: Nessun dato registrato. Il Blob è vuoto.");
+      // console.error("Errore: Nessun dato registrato. Il Blob è vuoto.");
       return;
     }
     const totalSize = recordedChunks.reduce(
       (acc, chunk) => acc + chunk.size,
       0
     );
-    console.log(
-      `Dimensione totale del video registrato: ${(totalSize / 1048576).toFixed(
-        2
-      )} MB`
-    );
+    // console.log(
+    //   `Dimensione totale del video registrato: ${(totalSize / 1048576).toFixed(
+    //     2
+    //   )} MB`
+    // );
     saveVideo(currentActionText); // Usa la variabile globale
   };
 
@@ -185,6 +185,60 @@ function startRecording(actionText = "Registrazione") {
 
 // Funzione per fermare la registrazione e salvare il video
 function stopAndSaveRecording(actionText) {
+  if (skipNextRecording) {
+    // console.log("Aggiornamento del video precedente con nuove informazioni.");
+    skipNextRecording = false; // Reimposta il flag
+
+    // Aggiorna l'ultimo video salvato con il nuovo punteggio e azione
+    openDB((db) => {
+      const transaction = db.transaction(DB_STORE, "readwrite");
+      const store = transaction.objectStore(DB_STORE);
+
+      // Recupera l'ultimo video salvato
+      const request = store.getAll();
+      request.onsuccess = () => {
+        const videos = request.result;
+        if (videos.length > 0) {
+          const lastVideo = videos[videos.length - 1]; // Ottieni l'ultimo video
+          lastVideo.actionText = actionText; // Aggiorna l'azione
+          lastVideo.matchState = JSON.parse(localStorage.getItem("matchState")); // Aggiorna lo stato della partita
+          store.put(lastVideo); // Salva le modifiche
+
+          // Aggiorna il DOM in tempo reale
+          const matchInfoElement = document.querySelector(
+            `.match-info[data-id="${lastVideo.id}"]`
+          );
+          if (matchInfoElement) {
+            // Aggiorna il punteggio e l'azione nel DOM
+            const scorePlayer1Element = matchInfoElement.querySelector(
+              ".scoreDisplayPlayer1"
+            );
+            const scorePlayer2Element = matchInfoElement.querySelector(
+              ".scoreDisplayPlayer2"
+            );
+            const actionTextElement =
+              matchInfoElement.querySelector(".action-text");
+
+            if (scorePlayer1Element && scorePlayer2Element) {
+              scorePlayer1Element.textContent =
+                lastVideo.matchState.scoreDisplayPlayer1 || "0";
+              scorePlayer2Element.textContent =
+                lastVideo.matchState.scoreDisplayPlayer2 || "0";
+            }
+
+            if (actionTextElement) {
+              actionTextElement.innerHTML = actionText;
+            }
+          }
+
+          // console.log("Video aggiornato con successo.");
+        }
+      };
+    });
+
+    return; // Non salvare un nuovo video
+  }
+
   if (isRecording && mediaRecorder.state !== "inactive") {
     currentActionText = actionText; // Passa actionText alla variabile globale
     isStoppingCamera = false;
@@ -429,10 +483,10 @@ function deleteAllVideos() {
     };
 
     request.onerror = (event) => {
-      console.error(
-        "Errore nella cancellazione dei video:",
-        event.target.error
-      );
+      // console.error(
+      //   "Errore nella cancellazione dei video:",
+      //   event.target.error
+      // );
     };
   });
 }
@@ -478,11 +532,11 @@ document
       if (event.target.classList.contains("btn-aceP1"))
         actionText = `<span class="actionTextAzzurro"> Ace: </span> <span> ${nameP1}</span>`;
       if (event.target.classList.contains("btn-erroreP1"))
-        actionText = `<span class="actionTextRed"> Errore Forzato: </span> <span> ${nameP1}</span>`;
+        actionText = `<span class="actionTextRed"> Errore: </span> <span> ${nameP1}</span>`;
       if (event.target.classList.contains("btn-aceP2"))
         actionText = `<span class="actionTextAzzurro"> Ace: </span> <span> ${nameP2}</span>`;
       if (event.target.classList.contains("btn-erroreP2"))
-        actionText = `<span class="actionTextRed"> Errore Forzato: </span> <span> ${nameP2}</span>`;
+        actionText = `<span class="actionTextRed"> Errore: </span> <span> ${nameP2}</span>`;
       if (event.target.classList.contains("btn-FalloP1"))
         actionText = `<span class="actionTextRed"> Fallo: </span> <span> ${nameP1}</span>`;
       if (event.target.classList.contains("btn-DoppioFalloP1"))
@@ -522,6 +576,7 @@ function loadAllVideos() {
       if (Object.keys(videosByMatch).length === 0) {
         const noVideosMessage = document.createElement("p");
         noVideosMessage.textContent = "Nessun video salvato";
+        noVideosMessage.style.color = "white";
         savedVideosContainer.appendChild(noVideosMessage);
       } else {
         Object.keys(videosByMatch).forEach((matchId) => {
@@ -564,7 +619,7 @@ function loadAllVideos() {
     };
 
     request.onerror = () => {
-      console.error("Error retrieving videos from database:", request.error);
+      // console.error("Error retrieving videos from database:", request.error);
     };
   });
 }
@@ -589,10 +644,10 @@ function deleteMatch(matchId, matchContainer) {
     };
 
     request.onerror = (event) => {
-      console.error(
-        "Errore nell'eliminazione della partita:",
-        event.target.error
-      );
+      // console.error(
+      //   "Errore nell'eliminazione della partita:",
+      //   event.target.error
+      // );
     };
   });
 }
@@ -790,10 +845,10 @@ function deleteVideo(id, matchInfo) {
     };
 
     transaction.onerror = (event) => {
-      console.error(
-        "Errore nell'eliminazione del video:",
-        event.target.errorCode
-      );
+      // console.error(
+      //   "Errore nell'eliminazione del video:",
+      //   event.target.errorCode
+      // );
     };
   });
 }
