@@ -420,6 +420,7 @@ hr {
 
 #undoButton {
   background-color: #f0f0f0;
+  color: black;
   padding: 8px 12px;
   border-radius: 6px;
   cursor: pointer;
