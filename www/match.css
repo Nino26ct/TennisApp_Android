@@ -223,12 +223,13 @@ hr {
 }
 
 #camera-view {
-  width: 90%;
+  width: 100%;
   /* max-width: 600px; */
-  height: 50vh;
+  height: 30vh;
   border-radius: 10px;
   margin-bottom: 10px;
   background-color: black;
+  background-image: none;
   margin: 0;
   object-fit: cover; /* Fa in modo che il video riempia tutto */
 }

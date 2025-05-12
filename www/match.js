@@ -300,6 +300,7 @@ function saveState() {
 }
 
 let skipNextRecording = false; // Flag per saltare la registrazione del prossimo video
+let isUndoingAction = false;
 
 function undoLastAction() {
   if (historyStack.length > 0) {
@@ -307,6 +308,10 @@ function undoLastAction() {
     if (isRecording) {
       skipNextRecording = true;
     } // Flag per saltare la registrazione del prossimo video
+
+    if (!isRecording) {
+      removeLastScoreFromPage();
+    }
 
     // Se siamo in tie-break, ripristina i punti del tie-break
     if (isTieBreak) {
@@ -359,7 +364,7 @@ function undoLastAction() {
       saveMatchState(); // Salva lo stato aggiornato
 
       // Mostra un messaggio di notifica
-      alert("AZIONE ANNULLATA PER PROSEGUIRE ESEGUIRE L'AZIONE CORRETTA");
+      alert("Azione annullata per proseguire eseguire l'azione corretta");
       return;
     }
 
@@ -412,7 +417,7 @@ function undoLastAction() {
       saveMatchState(); // Salva lo stato aggiornato
 
       // Mostra un messaggio di notifica
-      alert("AZIONE ANNULLATA PER PROSEGUIRE ESEGUIRE L'AZIONE CORRETTA");
+      alert("Azione annullata per proseguire eseguire l'azione corretta");
       return;
     }
 
@@ -458,12 +463,39 @@ function undoLastAction() {
     saveMatchState(); // Salva lo stato aggiornato
 
     // Mostra un messaggio di notifica
-    alert("AZIONE ANNULLATA PER PROSEGUIRE ESEGUIRE L'AZIONE CORRETTA");
+    alert("Azione annullata per proseguire eseguire l'azione corretta");
   } else {
     alert("Nessuna azione da annullare!");
   }
 }
 
+function removeLastScoreFromPage() {
+  isUndoingAction = true;
+
+  // Trova l'ultimo elemento match-info
+  const lastMatchInfo = document.querySelector(".match-info:last-of-type");
+  if (lastMatchInfo) {
+    const id = lastMatchInfo.getAttribute("data-id"); // Ottieni l'ID dell'elemento
+
+    // Rimuovi completamente l'elemento dal DOM
+    lastMatchInfo.remove();
+
+    // Elimina l'elemento da IndexedDB
+    openDB((db) => {
+      const transaction = db.transaction(DB_STORE, "readwrite");
+      const store = transaction.objectStore(DB_STORE);
+      store.delete(Number(id)); // Assicurati che l'ID sia un numero
+    });
+  }
+
+  // Rimuovi l'ultimo stato salvato dallo stack della cronologia
+  if (historyStack.length > 0) {
+    historyStack.pop();
+  }
+
+  // Aggiorna lo stato salvato nel localStorage
+  saveMatchState();
+}
 //DOPPIO FALLO
 
 function updateFalloDisplay() {
