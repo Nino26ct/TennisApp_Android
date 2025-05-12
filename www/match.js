@@ -54,6 +54,9 @@ function handleGameMode() {
         document.querySelector("#sezione-punti").style.height = isLandscape()
           ? "25vh"
           : "15vh";
+        document.querySelector(".div-servizio").style.top = isLandscape()
+          ? "70%"
+          : "78%";
       } else if (modalitaGioco === "Standard") {
         document.querySelector(".btn-player1").style.display = "inline-block";
         document.querySelector(".btn-player2").style.display = "inline-block";
@@ -66,6 +69,9 @@ function handleGameMode() {
         document.querySelector("#sezione-punti").style.height = isLandscape()
           ? "43vh"
           : "25vh";
+        document.querySelector(".div-servizio").style.top = isLandscape()
+          ? "83%"
+          : "86%";
       } else if (modalitaGioco === "Pro") {
         // Mostra tutti i pulsanti
         document.querySelectorAll(".sezione-punti button").forEach((button) => {
@@ -114,9 +120,10 @@ const btnPlayer2 = document.querySelector(".btn-player2");
 const btnErrorPlayer2 = document.querySelector(".btn-erroreP2");
 const btnAce2 = document.querySelector(".btn-aceP2");
 const btnFallo2 = document.querySelector(".btn-FalloP2");
+const ballServizio = document.querySelector(".div-servizio");
 
 // Variabili per il punteggio
-const linkImp = document.getElementById("link.impostazioni");
+// const linkImp = document.getElementById("link.impostazioni");
 const newMatch = document.getElementById("new-match");
 
 const winGame1 = document.getElementById("win-game1");
@@ -151,13 +158,156 @@ let isDeuceGamePointPlayer1 = false;
 let isDeuceGamePointPlayer2 = false;
 let historyStack = [];
 
-window.onload = function () {
-  loadMatchState(); // Carica lo stato salvato
-  updateScoreDisplay(); // Aggiorna il display del punteggio
+// Funzione per disabilitare tutti i pulsanti tranne quelli del servizio
+function disableAllButtonsExceptService() {
+  const allButtons = document.querySelectorAll("button");
+  allButtons.forEach((button) => {
+    button.disabled = true; // Disabilita tutti i pulsanti
+  });
 
-  // Imposta che il gioco è in corso se non è già stato fatto
-  if (localStorage.getItem("gameInProgress") !== "true") {
-    localStorage.setItem("gameInProgress", "true");
+  // Abilita solo i pulsanti del servizio
+  const serviceButtons = document.querySelectorAll(
+    "#servicePlayer1, #servicePlayer2"
+  );
+  serviceButtons.forEach((button) => {
+    button.disabled = false; // Abilita i pulsanti del servizio
+  });
+}
+
+// Funzione per abilitare tutti i pulsanti
+function enableAllButtons() {
+  const allButtons = document.querySelectorAll("button");
+  allButtons.forEach((button) => {
+    button.disabled = false; // Abilita tutti i pulsanti
+  });
+}
+
+// Funzione per mostrare il popup di selezione del servizio
+function askForService() {
+  const servicePopup = document.createElement("div");
+  servicePopup.id = "servicePopup";
+  servicePopup.innerHTML = `
+    <div class="popup-content">
+      <p>Chi gioca il servizio?</p>
+      <button id="servicePlayer1" class="service-button">${matchSettings.nameP1}</button>
+      <button id="servicePlayer2" class="service-button">${matchSettings.nameP2}</button>
+    </div>
+  `;
+  document.body.appendChild(servicePopup);
+
+  disableAllButtonsExceptService(); // Disabilita tutti i pulsanti tranne quelli del servizio
+
+  // Eventi per i pulsanti
+  document.getElementById("servicePlayer1").addEventListener("click", () => {
+    setService(1);
+    closeServicePopup();
+    enableAllButtons(); // Riabilita tutti i pulsanti
+    startMatch();
+  });
+
+  document.getElementById("servicePlayer2").addEventListener("click", () => {
+    setService(2);
+    closeServicePopup();
+    enableAllButtons(); // Riabilita tutti i pulsanti
+    startMatch();
+  });
+}
+
+// Funzione per aggiornare lo stato dei pulsanti in base al servizio
+function updateServiceButtons(player) {
+  if (player === 1) {
+    // Abilita i pulsanti di Player 1 e disabilita quelli di Player 2
+    btnAce1.disabled = false;
+    btnFallo1.disabled = false;
+    btnAce2.disabled = true;
+    btnFallo2.disabled = true;
+
+    // Aggiungi classe per annerire i pulsanti disabilitati
+    btnAce1.classList.remove("disabled-button");
+    btnFallo1.classList.remove("disabled-button");
+    btnAce2.classList.add("disabled-button");
+    btnFallo2.classList.add("disabled-button");
+  } else if (player === 2) {
+    // Abilita i pulsanti di Player 2 e disabilita quelli di Player 1
+    btnAce1.disabled = true;
+    btnFallo1.disabled = true;
+    btnAce2.disabled = false;
+    btnFallo2.disabled = false;
+
+    // Aggiungi classe per annerire i pulsanti disabilitati
+    btnAce1.classList.add("disabled-button");
+    btnFallo1.classList.add("disabled-button");
+    btnAce2.classList.remove("disabled-button");
+    btnFallo2.classList.remove("disabled-button");
+  }
+}
+
+// Nascondi il servizio all'inizio
+ballServizio.style.display = "none";
+
+// Funzione per impostare il servizio
+function setService(player) {
+  ballServizio.style.display = "block"; // Mostra il servizio
+  if (player === 1) {
+    ballServizio.style.left = "0"; // Posiziona la palla sul lato di Player 1
+  } else {
+    ballServizio.style.left = "93%"; // Posiziona la palla sul lato di Player 2
+  }
+  localStorage.setItem("currentService", player); // Salva il servizio nel localStorage
+  updateServiceButtons(player); // Aggiorna lo stato dei pulsanti in base al servizio
+}
+
+// Funzione per chiudere il popup
+function closeServicePopup() {
+  const servicePopup = document.getElementById("servicePopup");
+  if (servicePopup) {
+    servicePopup.remove();
+  }
+}
+
+// Funzione per avviare la partita
+function startMatch() {
+  // Imposta che la partita è iniziata
+  localStorage.setItem("gameInProgress", "true");
+
+  // Verifica se è modalità allenamento
+  const isTrainingMode = localStorage.getItem("isTieBreak") === "true";
+
+  if (isTrainingMode) {
+    // Avvia il tie-break direttamente in modalità allenamento
+    isTieBreak = true;
+    tieBreakPointsPlayer1 = 0;
+    tieBreakPointsPlayer2 = 0;
+    updateTieBreakDisplay(); // Aggiorna il display del tie-break
+  } else {
+    // Carica lo stato iniziale della partita
+    loadMatchState();
+    updateScoreDisplay(); // Aggiorna il display del punteggio
+  }
+}
+
+window.onload = function () {
+  // Controlla se la partita è già in corso
+  if (localStorage.getItem("gameInProgress") === "true") {
+    // Ripristina lo stato salvato
+    loadMatchState();
+    updateScoreDisplay();
+
+    // Ripristina il servizio
+    const currentService = localStorage.getItem("currentService");
+    if (currentService) {
+      setService(parseInt(currentService, 10)); // Ripristina il servizio
+    }
+  } else {
+    // Controlla se il servizio è già stato selezionato
+    const currentService = localStorage.getItem("currentService");
+    if (!currentService) {
+      // Mostra il popup per selezionare il servizio solo se non è stato selezionato
+      askForService();
+    } else {
+      // Se il servizio è già stato selezionato, avvia la partita
+      startMatch();
+    }
   }
 
   // Ripristina lo stato del tie-break
@@ -295,6 +445,7 @@ function saveState() {
     isDoubleFaultP1: doubleFaultBtn1.parentNode !== null, // Aggiunto
     isDoubleFaultP2: doubleFaultBtn2.parentNode !== null, // Aggiunto
     isTieBreak,
+    currentService: parseInt(localStorage.getItem("currentService"), 10), // Salva il servizio corrente
   };
   historyStack.push(currentState);
 }
@@ -305,6 +456,12 @@ let isUndoingAction = false;
 function undoLastAction() {
   if (historyStack.length > 0) {
     const previousState = historyStack.pop();
+
+    // Ripristina il servizio
+    if (previousState.currentService) {
+      setService(previousState.currentService); // Ripristina il servizio precedente
+    }
+
     if (isRecording) {
       skipNextRecording = true;
     } // Flag per saltare la registrazione del prossimo video
@@ -835,6 +992,11 @@ function incrementGame(player) {
   }
   totalGames++;
 
+  // Cambia il servizio ad ogni game
+  const currentService = parseInt(localStorage.getItem("currentService"), 10);
+  const nextService = currentService === 1 ? 2 : 1; // Alterna tra 1 e 2
+  setService(nextService); // Imposta il nuovo servizio
+
   // Attiva il tie-break se i game sono 6-6
   if (
     parseInt(winGame1.textContent, 10) === 6 &&
@@ -935,7 +1097,7 @@ function endMatch(winnerName, fromLoad = false) {
   localStorage.setItem("winner", winnerName); // Salviamo il vincitore
 
   // Nascondi il link impostazioni
-  linkImp.style.display = "none";
+  // linkImp.style.display = "none";
 
   // Disabilita tutti i pulsanti che incrementano il punteggio
   const buttons = document.querySelectorAll(
@@ -1159,9 +1321,9 @@ doubleFaultBtn2.addEventListener("click", () => {
   disableButtonsTemporarily();
 });
 
-linkImp.addEventListener("click", () => {
-  localStorage.setItem("gameInProgress", "false");
-}); // Imposta a false per indicare che la partita non è in corso})
+// linkImp.addEventListener("click", () => {
+//   localStorage.setItem("gameInProgress", "false");
+// }); // Imposta a false per indicare che la partita non è in corso})
 
 // Funzione per salvare lo stato della partita finita
 function saveFinishedMatch() {

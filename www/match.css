@@ -429,6 +429,55 @@ hr {
   margin-top: 10px;
 }
 
+.div-servizio {
+  position: absolute;
+  top: 90%;
+  left: 0%;
+}
+
+.div-servizio img {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+}
+
+#servicePopup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  z-index: 1000;
+  width: 80%;
+  max-width: 400px;
+  font-size: 16px;
+}
+
+#servicePopup .popup-content {
+  display: flex;
+  /* flex-direction: column; */
+  gap: 25px;
+}
+
+.service-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  /* font-size: 16px; */
+}
+
+.disabled-button {
+  opacity: 0.5; /* Rende il pulsante un po' annerito */
+  pointer-events: none; /* Disabilita i clic */
+}
+
 @media screen and (orientation: landscape) {
   #camera-view {
     width: 90%;
@@ -595,5 +644,11 @@ hr {
     width: 100%; /* Occupa tutta la larghezza disponibile */
     height: 180px; /* Mantiene le proporzioni */
     object-fit: cover; /* Fa in modo che il video occupi completamente l'area senza distorsioni */
+  }
+
+  .div-servizio {
+    position: absolute;
+    top: 88%;
+    left: 0%;
   }
 }

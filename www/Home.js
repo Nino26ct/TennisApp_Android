@@ -120,7 +120,8 @@ startMatchButton.addEventListener("click", () => {
   );
 
   // Imposta che la partita è iniziata
-  localStorage.setItem("gameInProgress", "true");
+  // localStorage.setItem("gameInProgress", "true");
+  localStorage.removeItem("currentService");
   localStorage.removeItem("matchFinished");
 
   // Controlla se il bottone è impostato su "Avvia Allenamento"
