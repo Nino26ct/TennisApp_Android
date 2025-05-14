@@ -109,6 +109,11 @@ window.addEventListener("DOMContentLoaded", () => {
 // Aggiungi un listener per gestire i cambiamenti di orientamento o dimensione della finestra
 window.addEventListener("resize", () => {
   handleGameMode();
+  // Controlla se il servizio è già stato selezionato
+  const currentService = localStorage.getItem("currentService");
+  if (currentService) {
+    setService(parseInt(currentService, 10)); // Ripristina il servizio solo se è stato selezionato
+  }
 });
 
 //Bottoni del campo
@@ -200,6 +205,7 @@ function askForService() {
   // Eventi per i pulsanti
   document.getElementById("servicePlayer1").addEventListener("click", () => {
     setService(1);
+    initialService = 1; // Salva il servizio iniziale
     closeServicePopup();
     enableAllButtons(); // Riabilita tutti i pulsanti
     startMatch();
@@ -207,6 +213,7 @@ function askForService() {
 
   document.getElementById("servicePlayer2").addEventListener("click", () => {
     setService(2);
+    initialService = 2; // Salva il servizio iniziale
     closeServicePopup();
     enableAllButtons(); // Riabilita tutti i pulsanti
     startMatch();
@@ -251,7 +258,7 @@ function setService(player) {
   if (player === 1) {
     ballServizio.style.left = "0"; // Posiziona la palla sul lato di Player 1
   } else {
-    ballServizio.style.left = "93%"; // Posiziona la palla sul lato di Player 2
+    ballServizio.style.left = isLandscape() ? "95.5%" : "93%"; // Posiziona la palla sul lato di Player 2
   }
   localStorage.setItem("currentService", player); // Salva il servizio nel localStorage
   updateServiceButtons(player); // Aggiorna lo stato dei pulsanti in base al servizio
@@ -772,9 +779,21 @@ function updateScore(player) {
     } else {
       tieBreakPointsPlayer2++;
     }
+
+    // Cambia il servizio nel tie-break
+    const totalTieBreakPoints = tieBreakPointsPlayer1 + tieBreakPointsPlayer2;
+    if (totalTieBreakPoints === 1 || totalTieBreakPoints % 2 === 1) {
+      // Cambia il servizio dopo il primo punto e poi ogni due punti
+      const currentService = parseInt(
+        localStorage.getItem("currentService"),
+        10
+      );
+      const nextService = currentService === 1 ? 2 : 1; // Alterna tra 1 e 2
+      setService(nextService);
+    }
+
     saveMatchState();
     updateTieBreakDisplay();
-
     if (
       tieBreakPointsPlayer1 >= matchSettings.tieBreak &&
       tieBreakPointsPlayer1 - tieBreakPointsPlayer2 >= 2
@@ -1163,6 +1182,9 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+// Variabile per tracciare chi ha iniziato il servizio nel primo set
+let initialService = 1; // 1 per Player 1, 2 per Player 2
+
 // Funzione per incrementare il set
 function incrementSet(player, maxSets, matchSettings) {
   const setsToWin = Math.ceil(maxSets / 2);
@@ -1191,6 +1213,10 @@ function incrementSet(player, maxSets, matchSettings) {
       totalSet++;
       resetGameAndPoints();
 
+      // Cambia il servizio per il nuovo set
+      initialService = initialService === 1 ? 2 : 1;
+      setService(initialService);
+
       // Attiva il tie-break per il nuovo set solo se siamo in allenamento
       if (localStorage.getItem("isTieBreak") === "true") {
         startTieBreak();
@@ -1208,6 +1234,10 @@ function incrementSet(player, maxSets, matchSettings) {
       totalGames = 1;
       totalSet++;
       resetGameAndPoints();
+
+      // Cambia il servizio per il nuovo set
+      initialService = initialService === 1 ? 2 : 1;
+      setService(initialService);
 
       // Attiva il tie-break per il nuovo set solo se siamo in allenamento
       if (localStorage.getItem("isTieBreak") === "true") {
@@ -1398,6 +1428,7 @@ newMatch.addEventListener("click", () => {
   localStorage.removeItem("sets");
   localStorage.removeItem("winner");
   localStorage.removeItem("matchSettings");
+  localStorage.removeItem("currentService");
 
   // Resetta il colore salvato
   localStorage.removeItem("campoColor");
