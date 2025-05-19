@@ -1,5 +1,31 @@
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap");
 
+@keyframes rotate360CloseOpen {
+  0% {
+    transform: rotate(0deg) scaleX(1);
+    opacity: 1;
+  }
+  40% {
+    transform: rotate(180deg) scaleX(0.1);
+    opacity: 0.2;
+  }
+  50% {
+    transform: rotate(180deg) scaleX(0);
+    opacity: 0;
+  }
+  60% {
+    transform: rotate(180deg) scaleX(0.1);
+    opacity: 0.2;
+  }
+  100% {
+    transform: rotate(360deg) scaleX(1);
+    opacity: 1;
+  }
+}
+.rotate-animation {
+  animation: rotate360CloseOpen 0.9s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
 body {
   background-color: rgb(156, 151, 151);
   margin: 0; /* Rimuove margini esterni */

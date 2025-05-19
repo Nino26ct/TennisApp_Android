@@ -308,6 +308,15 @@ function startMatch() {
 }
 
 function cambioCampo() {
+  const sezionePunti = document.getElementById("sezione-punti");
+  sezionePunti.classList.add("rotate-animation");
+
+  // Rimuovi la classe dopo l'animazione per poterla riapplicare in futuro
+  sezionePunti.addEventListener("animationend", function handler() {
+    sezionePunti.classList.remove("rotate-animation");
+    sezionePunti.removeEventListener("animationend", handler);
+  });
+
   const btnPlayer1 = document.querySelector(".btn-player1");
   const btnErrorPlayer1 = document.querySelector(".btn-erroreP1");
   const btnAce1 = document.querySelector(".btn-aceP1");
@@ -871,11 +880,11 @@ function updateFalloDisplay() {
 
 // Creazione dei pulsanti "Doppio Fallo" per entrambi i giocatori
 const doubleFaultBtn1 = document.createElement("button");
-doubleFaultBtn1.textContent = "Doppio Fallo";
+doubleFaultBtn1.textContent = "DOPPIO FALLO";
 doubleFaultBtn1.classList.add("btn-DoppioFalloP1");
 
 const doubleFaultBtn2 = document.createElement("button");
-doubleFaultBtn2.textContent = "Doppio Fallo";
+doubleFaultBtn2.textContent = "DOPPIO FALLO";
 doubleFaultBtn2.classList.add("btn-DoppioFalloP2");
 
 // Funzione per ripristinare il pulsante "Fallo" se viene premuto un altro pulsante
