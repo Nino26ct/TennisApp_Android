@@ -254,16 +254,30 @@ ballServizio.style.display = "none";
 
 // Funzione per impostare il servizio
 function setService(player) {
-  ballServizio.style.display = "block"; // Mostra il servizio
-  if (player === 1) {
-    ballServizio.style.left = "0"; // Posiziona la palla sul lato di Player 1
-  } else {
-    ballServizio.style.left = isLandscape() ? "95.5%" : "93%"; // Posiziona la palla sul lato di Player 2
-  }
-  localStorage.setItem("currentService", player); // Salva il servizio nel localStorage
-  updateServiceButtons(player); // Aggiorna lo stato dei pulsanti in base al servizio
-}
+  ballServizio.style.display = "block";
+  const rightPos = isLandscape() ? "95.5%" : "93%";
 
+  if (player === 1) {
+    // Player 1: sinistra se left 25% o "", destra se left 75%
+    ballServizio.style.left =
+      !btnPlayer1.style.left || btnPlayer1.style.left === "25%"
+        ? "0"
+        : rightPos;
+  } else if (player === 2) {
+    // Player 2: destra se right 75%, sinistra se right 25%
+    if (btnPlayer2.style.right === "75%") {
+      ballServizio.style.left = "0";
+    } else if (btnPlayer2.style.right === "25%") {
+      ballServizio.style.left = rightPos;
+    } else {
+      // Default: se non è impostato, considera destra (come inizio partita)
+      ballServizio.style.left = rightPos;
+    }
+  }
+
+  localStorage.setItem("currentService", player);
+  updateServiceButtons(player);
+}
 // Funzione per chiudere il popup
 function closeServicePopup() {
   const servicePopup = document.getElementById("servicePopup");
@@ -293,12 +307,152 @@ function startMatch() {
   }
 }
 
+function cambioCampo() {
+  const btnPlayer1 = document.querySelector(".btn-player1");
+  const btnErrorPlayer1 = document.querySelector(".btn-erroreP1");
+  const btnAce1 = document.querySelector(".btn-aceP1");
+  const btnFallo1 = document.querySelector(".btn-FalloP1");
+  const btnDoppioFallo1 = document.querySelector(".btn-DoppioFalloP1");
+  const btnPlayer2 = document.querySelector(".btn-player2");
+  const btnErrorPlayer2 = document.querySelector(".btn-erroreP2");
+  const btnAce2 = document.querySelector(".btn-aceP2");
+  const btnFallo2 = document.querySelector(".btn-FalloP2");
+  const btnDoppioFallo2 = document.querySelector(".btn-DoppioFalloP2");
+  const ballServizio = document.querySelector(".div-servizio");
+  const modalitaGioco = matchSettings.modalitaGioco;
+
+  if (modalitaGioco === "Lite") {
+    // Controlla la posizione corrente e inverte
+    if (btnPlayer1.style.left === "75%") {
+      btnPlayer1.style.left = "25%";
+      btnPlayer2.style.right = "25%";
+    } else {
+      btnPlayer1.style.left = "75%";
+      btnPlayer2.style.right = "75%";
+    }
+  } else if (modalitaGioco === "Standard") {
+    // Controlla la posizione corrente e inverte
+    if (btnPlayer1.style.left === "75%") {
+      btnPlayer1.style.left = "25%";
+      btnPlayer2.style.right = "25%";
+      btnErrorPlayer1.style.left = "25%";
+      btnErrorPlayer2.style.right = "25%";
+    } else {
+      btnPlayer1.style.left = "75%";
+      btnPlayer2.style.right = "75%";
+      btnErrorPlayer1.style.left = "75%";
+      btnErrorPlayer2.style.right = "75%";
+    }
+  } else if (modalitaGioco === "Pro") {
+    // Controlla la posizione corrente e inverte
+    if (btnPlayer1.style.left === "75%") {
+      btnPlayer1.style.left = "25%";
+      btnPlayer2.style.right = "25%";
+      btnErrorPlayer1.style.left = "25%";
+      btnErrorPlayer2.style.right = "25%";
+      btnAce1.style.left = "0";
+      btnAce1.style.right = "auto";
+      btnAce2.style.right = "0";
+      btnAce2.style.left = "auto";
+      btnFallo1.style.left = "95px";
+      btnFallo1.style.right = "auto";
+      btnFallo2.style.right = "95px";
+      btnFallo2.style.left = "auto";
+      // Muovi anche i doppio fallo
+      if (btnDoppioFallo1) {
+        btnDoppioFallo1.style.left = "95px";
+        btnDoppioFallo1.style.right = "auto";
+      }
+      if (btnDoppioFallo2) {
+        btnDoppioFallo2.style.right = "95px";
+        btnDoppioFallo2.style.left = "auto";
+      }
+    } else {
+      btnPlayer1.style.left = "75%";
+      btnPlayer2.style.right = "75%";
+      btnErrorPlayer1.style.left = "75%";
+      btnErrorPlayer2.style.right = "75%";
+      btnAce1.style.left = "auto";
+      btnAce1.style.right = "0";
+      btnAce2.style.left = "0";
+      btnAce2.style.right = "auto";
+      btnFallo1.style.right = "95px";
+      btnFallo1.style.left = "auto";
+      btnFallo2.style.left = "95px";
+      btnFallo2.style.right = "auto";
+      // Muovi anche i doppio fallo
+      if (btnDoppioFallo1) {
+        btnDoppioFallo1.style.right = "95px";
+        btnDoppioFallo1.style.left = "auto";
+      }
+      if (btnDoppioFallo2) {
+        btnDoppioFallo2.style.left = "95px";
+        btnDoppioFallo2.style.right = "auto";
+      }
+    }
+  }
+
+  // Salva lo stato del campo nel localStorage
+  const campoState = {
+    btnPlayer1: btnPlayer1.style.left,
+    btnPlayer2: btnPlayer2.style.right,
+    btnErrorPlayer1: btnErrorPlayer1.style.left,
+    btnErrorPlayer2: btnErrorPlayer2.style.right,
+    btnAce1Left: btnAce1.style.left, // salva left
+    btnAce1Right: btnAce1.style.right, // salva right
+    btnAce2Left: btnAce2.style.left, // salva left
+    btnAce2Right: btnAce2.style.right, // salva right
+    btnFallo1Left: btnFallo1.style.left,
+    btnFallo1Right: btnFallo1.style.right,
+    btnFallo2Right: btnFallo2.style.right,
+    btnFallo2Left: btnFallo2.style.left,
+    ballServizio: ballServizio.style.left,
+  };
+  localStorage.setItem("campoState", JSON.stringify(campoState));
+
+  const currentService = parseInt(localStorage.getItem("currentService"), 10);
+  if (currentService) {
+    setService(currentService);
+  }
+}
+document.querySelector(".btn-cambioCampo").addEventListener("click", () => {
+  cambioCampo();
+});
+
 window.onload = function () {
   // Controlla se la partita è già in corso
   if (localStorage.getItem("gameInProgress") === "true") {
     // Ripristina lo stato salvato
     loadMatchState();
     updateScoreDisplay();
+
+    // Ripristina lo stato del campo dal localStorage
+    const savedCampoState = JSON.parse(localStorage.getItem("campoState"));
+    if (savedCampoState) {
+      const btnPlayer1 = document.querySelector(".btn-player1");
+      const btnPlayer2 = document.querySelector(".btn-player2");
+      const btnErrorPlayer1 = document.querySelector(".btn-erroreP1");
+      const btnErrorPlayer2 = document.querySelector(".btn-erroreP2");
+      const btnAce1 = document.querySelector(".btn-aceP1");
+      const btnAce2 = document.querySelector(".btn-aceP2");
+      const btnFallo1 = document.querySelector(".btn-FalloP1");
+      const btnFallo2 = document.querySelector(".btn-FalloP2");
+      const ballServizio = document.querySelector(".div-servizio");
+
+      btnPlayer1.style.left = savedCampoState.btnPlayer1;
+      btnPlayer2.style.right = savedCampoState.btnPlayer2;
+      btnErrorPlayer1.style.left = savedCampoState.btnErrorPlayer1;
+      btnErrorPlayer2.style.right = savedCampoState.btnErrorPlayer2;
+      btnAce1.style.left = savedCampoState.btnAce1Left;
+      btnAce1.style.right = savedCampoState.btnAce1Right;
+      btnAce2.style.left = savedCampoState.btnAce2Left;
+      btnAce2.style.right = savedCampoState.btnAce2Right;
+      btnFallo1.style.left = savedCampoState.btnFallo1Left;
+      btnFallo1.style.right = savedCampoState.btnFallo1Right;
+      btnFallo2.style.left = savedCampoState.btnFallo2Left;
+      btnFallo2.style.right = savedCampoState.btnFallo2Right;
+      ballServizio.style.left = savedCampoState.ballServizio;
+    }
 
     // Ripristina il servizio
     const currentService = localStorage.getItem("currentService");
@@ -453,6 +607,21 @@ function saveState() {
     isDoubleFaultP2: doubleFaultBtn2.parentNode !== null, // Aggiunto
     isTieBreak,
     currentService: parseInt(localStorage.getItem("currentService"), 10), // Salva il servizio corrente
+
+    // Salva le posizioni dei bottoni e della palla servizio
+    btnPlayer1Left: btnPlayer1.style.left,
+    btnPlayer2Right: btnPlayer2.style.right,
+    btnErrorPlayer1Left: btnErrorPlayer1.style.left,
+    btnErrorPlayer2Right: btnErrorPlayer2.style.right,
+    btnAce1Left: btnAce1.style.left,
+    btnAce1Right: btnAce1.style.right, // aggiungi questa riga
+    btnAce2Left: btnAce2.style.left, // aggiungi questa riga
+    btnAce2Right: btnAce2.style.right,
+    btnFallo1Left: btnFallo1.style.left,
+    btnFallo1Right: btnFallo1.style.right,
+    btnFallo2Left: btnFallo2.style.left,
+    btnFallo2Right: btnFallo2.style.right,
+    ballServizioLeft: ballServizio.style.left,
   };
   historyStack.push(currentState);
 }
@@ -463,6 +632,33 @@ let isUndoingAction = false;
 function undoLastAction() {
   if (historyStack.length > 0) {
     const previousState = historyStack.pop();
+
+    if (previousState.btnPlayer1Left !== undefined)
+      btnPlayer1.style.left = previousState.btnPlayer1Left;
+    if (previousState.btnPlayer2Right !== undefined)
+      btnPlayer2.style.right = previousState.btnPlayer2Right;
+    if (previousState.btnErrorPlayer1Left !== undefined)
+      btnErrorPlayer1.style.left = previousState.btnErrorPlayer1Left;
+    if (previousState.btnErrorPlayer2Right !== undefined)
+      btnErrorPlayer2.style.right = previousState.btnErrorPlayer2Right;
+    if (previousState.btnAce1Left !== undefined)
+      btnAce1.style.left = previousState.btnAce1Left;
+    if (previousState.btnAce1Right !== undefined)
+      btnAce1.style.right = previousState.btnAce1Right;
+    if (previousState.btnAce2Left !== undefined)
+      btnAce2.style.left = previousState.btnAce2Left;
+    if (previousState.btnAce2Right !== undefined)
+      btnAce2.style.right = previousState.btnAce2Right;
+    if (previousState.btnFallo1Left !== undefined)
+      btnFallo1.style.left = previousState.btnFallo1Left;
+    if (previousState.btnFallo1Right !== undefined)
+      btnFallo1.style.right = previousState.btnFallo1Right;
+    if (previousState.btnFallo2Left !== undefined)
+      btnFallo2.style.left = previousState.btnFallo2Left;
+    if (previousState.btnFallo2Right !== undefined)
+      btnFallo2.style.right = previousState.btnFallo2Right;
+    if (previousState.ballServizioLeft !== undefined)
+      ballServizio.style.left = previousState.ballServizioLeft;
 
     // Ripristina il servizio
     if (previousState.currentService) {
@@ -527,6 +723,8 @@ function undoLastAction() {
       updateAceDisplay();
       saveMatchState(); // Salva lo stato aggiornato
 
+      historyStack = [];
+
       // Mostra un messaggio di notifica
       alert("Azione annullata per proseguire eseguire l'azione corretta");
       return;
@@ -580,6 +778,8 @@ function undoLastAction() {
       updateAceDisplay();
       saveMatchState(); // Salva lo stato aggiornato
 
+      historyStack = [];
+
       // Mostra un messaggio di notifica
       alert("Azione annullata per proseguire eseguire l'azione corretta");
       return;
@@ -625,6 +825,8 @@ function undoLastAction() {
     updateFalloDisplay();
     updateAceDisplay();
     saveMatchState(); // Salva lo stato aggiornato
+
+    historyStack = [];
 
     // Mostra un messaggio di notifica
     alert("Azione annullata per proseguire eseguire l'azione corretta");
@@ -692,9 +894,13 @@ function restoreFaultButton() {
 function replaceWithDoubleFaultButton(player) {
   if (player === 1) {
     btnFallo1.style.display = "none";
+    doubleFaultBtn1.style.left = btnFallo1.style.left;
+    doubleFaultBtn1.style.right = btnFallo1.style.right;
     btnFallo1.parentNode.insertBefore(doubleFaultBtn1, btnFallo1.nextSibling);
   } else {
     btnFallo2.style.display = "none";
+    doubleFaultBtn2.style.left = btnFallo2.style.left;
+    doubleFaultBtn2.style.right = btnFallo2.style.right;
     btnFallo2.parentNode.insertBefore(doubleFaultBtn2, btnFallo2.nextSibling);
   }
 }
@@ -1429,6 +1635,12 @@ newMatch.addEventListener("click", () => {
   localStorage.removeItem("winner");
   localStorage.removeItem("matchSettings");
   localStorage.removeItem("currentService");
+  localStorage.removeItem("campoState");
+
+  // Azzeramento variabili servizio e stato
+  initialService = 1;
+  ballServizio.style.display = "none";
+  ballServizio.style.left = "0";
 
   // Resetta il colore salvato
   localStorage.removeItem("campoColor");

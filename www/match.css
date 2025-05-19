@@ -7,6 +7,7 @@ body {
   overflow-x: hidden;
   width: 100%;
 }
+
 #sezione-punti {
   position: relative;
   width: 100%;
@@ -152,13 +153,12 @@ hr {
 }
 
 .btn-aceP1 {
-  /* color: white; */
   background-color: #06eee3;
   top: 0;
   left: 0;
-  margin: 0; /* Rimuove eventuali margini */
+  right: auto; /* AGGIUNGI QUESTA RIGA */
+  margin: 0;
 }
-
 .btn-aceP2 {
   /* color: white; */
   background-color: #06eee3;
@@ -419,6 +419,15 @@ hr {
   box-sizing: border-box;
 }
 
+.container-btnUndoCambio {
+  display: flex;
+  justify-content: space-between; /* Posiziona i pulsanti agli estremi */
+  align-items: center; /* Allinea verticalmente i pulsanti */
+  width: 95.8%; /* Occupa tutta la larghezza disponibile */
+  padding: 0 10px; /* Aggiunge un po' di spazio ai lati */
+  margin-top: 15px;
+}
+
 #undoButton {
   background-color: #f0f0f0;
   color: black;
@@ -426,7 +435,15 @@ hr {
   border-radius: 6px;
   cursor: pointer;
   font-size: 18px;
-  margin-top: 10px;
+}
+
+.btn-cambioCampo {
+  background-color: #f0f0f0;
+  color: black;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
 }
 
 .div-servizio {
@@ -650,5 +667,9 @@ hr {
     position: absolute;
     top: 88%;
     left: 0%;
+  }
+
+  .container-btnUndoCambio {
+    width: 97%;
   }
 }
