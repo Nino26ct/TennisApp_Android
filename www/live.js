@@ -1,14 +1,4 @@
-const firebaseConfig = {
-  apiKey: "AIzaSyA5Cib2bfjmmARWwUCin44FdSKPPphvjQw",
-  authDomain: "tennis-points-569a7.firebaseapp.com",
-  databaseURL:
-    "https://tennis-points-569a7-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "tennis-points-569a7",
-  storageBucket: "tennis-points-569a7.firebasestorage.app",
-  messagingSenderId: "1043880828352",
-  appId: "1:1043880828352:web:4864880850fab9d6bc7c25",
-};
-firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(window.firebaseConfig);
 
 function tennisScore(score) {
   const scores = ["0", "15", "30", "40", "A"];
