@@ -454,6 +454,21 @@ hr {
   margin-top: 15px;
 }
 
+.match-id-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px; /* distanza tra match-id e link-match */
+}
+
+.match-id-group button {
+  background-color: rgb(0, 153, 0);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 20px;
+}
+
 #undoButton {
   background-color: #f0f0f0;
   color: black;

@@ -13,7 +13,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
 </head>
 
@@ -39,7 +41,7 @@
         <button id="mostraNascondiCamera">Nascondi Camera</button>
         <div id="camera-container">
             <video id="camera-view" autoplay playsinline
-                poster="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMB/aqXJxQAAAAASUVORK5CYII="
+                poster="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8z8AABfwC/qkAAAAASUVORK5CYII="
                 style="background-color: black;"></video>
             <br>
             <button class="btn-camera" id="start-camera">Avvia Registrazione</button>
@@ -73,6 +75,12 @@
         <button id="undoButton" title="Annulla">
             <i class="fas fa-undo"></i>
         </button>
+        <span class="match-id-group">
+            <p id="match-id" style="font-size: 16px; color: #555; display: inline;"></p>
+            <button id="link-match" class="link-match" title="Condividi">
+                <i class="fab fa-whatsapp"></i>
+            </button>
+        </span>
         <button class="btn-cambioCampo" title="Cambio Campo">
             <i class="fa-solid fa-arrows-rotate"></i>
         </button>

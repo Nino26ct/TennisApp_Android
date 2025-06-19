@@ -166,6 +166,11 @@ form button {
   color: #f3ef16;
 }
 
+.btn-live {
+  background-color: #007bff;
+  margin-top: 30px;
+}
+
 @media screen and (orientation: landscape) {
   body {
     overflow-y: auto;

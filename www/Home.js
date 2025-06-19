@@ -1,3 +1,23 @@
+const firebaseConfig = {
+  apiKey: "AIzaSyA5Cib2bfjmmARWwUCin44FdSKPPphvjQw",
+  authDomain: "tennis-points-569a7.firebaseapp.com",
+  databaseURL:
+    "https://tennis-points-569a7-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "tennis-points-569a7",
+  storageBucket: "tennis-points-569a7.firebasestorage.app",
+  messagingSenderId: "1043880828352",
+  appId: "1:1043880828352:web:4864880850fab9d6bc7c25",
+};
+firebase.initializeApp(firebaseConfig);
+
+const matchId = localStorage.getItem("currentMatchId");
+if (matchId) {
+  const matchIdElement = document.getElementById("match-id");
+  if (matchIdElement) {
+    matchIdElement.textContent = `ID Partita: ${matchId}`;
+  }
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   // Controlla se la partita è in corso
   if (localStorage.getItem("gameInProgress") === "true") {
@@ -77,7 +97,32 @@ document.getElementById("tieBreak").addEventListener("input", saveInputData);
 
 const startMatchButton = document.getElementById("start-match");
 
-startMatchButton.addEventListener("click", () => {
+// // Funzione per generare un numero casuale di 6 cifre come stringa
+function generateNumericId(length = 6) {
+  let id = "";
+  for (let i = 0; i < length; i++) {
+    id += Math.floor(Math.random() * 10);
+  }
+  return id;
+}
+
+// // Funzione per generare un ID numerico di 6 cifre NON duplicato su Firebase
+async function generateUniqueMatchId() {
+  let matchId;
+  let exists = true;
+  while (exists) {
+    matchId = generateNumericId(6);
+    const snapshot = await firebase
+      .database()
+      .ref("matches/" + matchId)
+      .once("value");
+    exists = snapshot.exists();
+  }
+  return matchId;
+}
+startMatchButton.addEventListener("click", async () => {
+  const matchId = await generateUniqueMatchId();
+  localStorage.setItem("currentMatchId", matchId);
   // Raccogli i dati inseriti dall'utente
   const nameMatch = document
     .getElementById("nameMatch")
@@ -143,3 +188,7 @@ document
       localStorage.setItem("campoColor", colore);
     });
   });
+
+document.getElementById("guarda-live").addEventListener("click", function () {
+  window.location.href = "live.html";
+});

@@ -1,3 +1,23 @@
+const firebaseConfig = {
+  apiKey: "AIzaSyA5Cib2bfjmmARWwUCin44FdSKPPphvjQw",
+  authDomain: "tennis-points-569a7.firebaseapp.com",
+  databaseURL:
+    "https://tennis-points-569a7-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "tennis-points-569a7",
+  storageBucket: "tennis-points-569a7.firebasestorage.app",
+  messagingSenderId: "1043880828352",
+  appId: "1:1043880828352:web:4864880850fab9d6bc7c25",
+};
+firebase.initializeApp(firebaseConfig);
+
+const matchId = localStorage.getItem("currentMatchId");
+if (matchId) {
+  const matchIdElement = document.getElementById("match-id");
+  if (matchIdElement) {
+    matchIdElement.textContent = `ID Partita: ${matchId}`;
+  }
+}
+
 // Recupera il colore dal localStorage
 const coloreSalvato = localStorage.getItem("campoColor");
 
@@ -277,6 +297,8 @@ function setService(player) {
 
   localStorage.setItem("currentService", player);
   updateServiceButtons(player);
+
+  currentService = player; // Aggiorna il servizio corrente
 }
 // Funzione per chiudere il popup
 function closeServicePopup() {
@@ -593,6 +615,52 @@ function loadMatchState() {
   }
 }
 
+let currentServiceValue = localStorage.getItem("currentService");
+let currentService =
+  currentServiceValue !== null && !isNaN(parseInt(currentServiceValue, 10))
+    ? parseInt(currentServiceValue, 10)
+    : null;
+
+function saveLiveScore() {
+  const matchId = localStorage.getItem("currentMatchId");
+  if (!matchId) return;
+  const liveScore = {
+    scorePlayer1,
+    scorePlayer2,
+    winGame1: winGame1.textContent,
+    winGame2: winGame2.textContent,
+    winSet1: winSet1.textContent,
+    winSet2: winSet2.textContent,
+    nameP1: matchSettings.nameP1,
+    nameP2: matchSettings.nameP2,
+    nameMatch: matchSettings.nameMatch,
+    tennisScores,
+    advantagePlayer,
+    displayPlayer1: isTieBreak
+      ? tieBreakPointsPlayer1
+      : scoreDisplayPlayer1.textContent,
+    displayPlayer2: isTieBreak
+      ? tieBreakPointsPlayer2
+      : scoreDisplayPlayer2.textContent,
+    currentService, // Salva il servizio corrente
+    currentGameCount1: parseInt(winGame1.textContent, 10), // Aggiunto: numero di game vinti dal Player 1
+    currentGameCount2: parseInt(winGame2.textContent, 10), // Aggiunto: numero di game vinti dal Player 2
+    currentSetCount1: parseInt(winSet1.textContent, 10), // Aggiunto: numero di set vinti dal Player 1
+    currentSetCount2: parseInt(winSet2.textContent, 10), // Aggiunto: numero di set vinti dal Player 2
+    currentSet: totalSet, // Aggiunto: set corrente
+    setCount: matchSettings.setCount, // Aggiunto: numero di set totali
+    sets: JSON.parse(localStorage.getItem("sets")) || [], // Aggiunto: array dei set
+    isTieBreak, // Aggiunto: stato del tie-break
+    tieBreakPointsPlayer1, // Aggiunto: punti del tie-break per Player 1
+    tieBreakPointsPlayer2, // Aggiunto: punti del tie-break per Player 2
+    // aggiungi altri dati se vuoi
+  };
+  firebase
+    .database()
+    .ref("matches/" + matchId)
+    .set(liveScore);
+}
+
 function saveState() {
   const currentState = {
     scorePlayer1,
@@ -711,6 +779,11 @@ function undoLastAction() {
       isDeuceGamePointPlayer2 = previousState.isDeuceGamePointPlayer2;
       advantagePlayer = previousState.advantagePlayer;
 
+      isTieBreak = previousState.isTieBreak;
+      tieBreakPointsPlayer1 = previousState.tieBreakPointsPlayer1;
+      tieBreakPointsPlayer2 = previousState.tieBreakPointsPlayer2;
+      updateTieBreakDisplay();
+
       // Ripristina lo stato del pulsante "Doppio Fallo"
       if (previousState.isDoubleFaultP1) {
         replaceWithDoubleFaultButton(1);
@@ -725,6 +798,21 @@ function undoLastAction() {
       }
 
       totalSet--; // Decrementa il contatore dei set
+
+      totalGames =
+        parseInt(previousState.winGame1, 10) +
+        parseInt(previousState.winGame2, 10) +
+        1;
+
+      // Rimuovi l'ultimo set dall'array dei set conclusi
+      let sets = JSON.parse(localStorage.getItem("sets")) || [];
+      if (sets.length > 0) {
+        sets.pop();
+        localStorage.setItem("sets", JSON.stringify(sets));
+      }
+
+      // Aggiorna anche su Firebase il live score
+      saveLiveScore();
 
       // Aggiorna i display
       updateScoreDisplay();
@@ -847,20 +935,50 @@ function undoLastAction() {
 function removeLastScoreFromPage() {
   isUndoingAction = true;
 
-  // Trova l'ultimo elemento match-info
-  const lastMatchInfo = document.querySelector(".match-info:last-of-type");
-  if (lastMatchInfo) {
-    const id = lastMatchInfo.getAttribute("data-id"); // Ottieni l'ID dell'elemento
+  let currentSet = totalSet;
+  let found = false;
 
-    // Rimuovi completamente l'elemento dal DOM
-    lastMatchInfo.remove();
+  while (currentSet > 0 && !found) {
+    const setsContainer = document.querySelector(".sets-container");
+    if (!setsContainer) return;
 
-    // Elimina l'elemento da IndexedDB
-    openDB((db) => {
-      const transaction = db.transaction(DB_STORE, "readwrite");
-      const store = transaction.objectStore(DB_STORE);
-      store.delete(Number(id)); // Assicurati che l'ID sia un numero
-    });
+    const setWrapper = setsContainer.querySelector(
+      `.set-wrapper[data-set="${currentSet}"]`
+    );
+    if (!setWrapper) {
+      currentSet--;
+      continue;
+    }
+
+    const setContent = setWrapper.querySelector(".set-content");
+    if (!setContent) {
+      currentSet--;
+      continue;
+    }
+
+    // Trova tutti i game-container del set corrente, in ordine decrescente
+    const gameContainers = Array.from(
+      setContent.querySelectorAll(".game-container")
+    ).reverse();
+
+    for (const gameContainer of gameContainers) {
+      const matchInfo = gameContainer.querySelector(".match-info:last-of-type");
+      if (matchInfo) {
+        const id = matchInfo.getAttribute("data-id");
+        matchInfo.remove();
+
+        // Elimina l'elemento da IndexedDB
+        openDB((db) => {
+          const transaction = db.transaction(DB_STORE, "readwrite");
+          const store = transaction.objectStore(DB_STORE);
+          store.delete(Number(id));
+        });
+
+        found = true;
+        break;
+      }
+    }
+    if (!found) currentSet--;
   }
 
   // Rimuovi l'ultimo stato salvato dallo stack della cronologia
@@ -1077,6 +1195,7 @@ function updateScore(player) {
     }
     updateScoreDisplay();
     saveMatchState();
+    saveLiveScore(); // Salva il punteggio in tempo reale
   }
 }
 
@@ -1178,6 +1297,7 @@ function updateScoreDisplay() {
       scoreDisplayPlayer2.textContent = tennisScores[scorePlayer2];
     }
   }
+  saveLiveScore(); // Salva il punteggio in tempo reale
 }
 
 // Funzione per mostrare il punto vincente e poi incrementare il game
@@ -1209,6 +1329,7 @@ function showWinningPointDeuce(player) {
 function updateTieBreakDisplay() {
   scoreDisplayPlayer1.textContent = tieBreakPointsPlayer1;
   scoreDisplayPlayer2.textContent = tieBreakPointsPlayer2;
+  saveLiveScore(); // Salva il punteggio in tempo reale
 }
 
 // Funzione per incrementare il game
@@ -1436,6 +1557,7 @@ function incrementSet(player, maxSets, matchSettings) {
       if (localStorage.getItem("isTieBreak") === "true") {
         startTieBreak();
       }
+      saveLiveScore(); // Salva il punteggio in tempo reale
     }
   } else if (player === 2) {
     let currentSetWins = parseInt(winSet2.textContent, 10);
@@ -1458,6 +1580,7 @@ function incrementSet(player, maxSets, matchSettings) {
       if (localStorage.getItem("isTieBreak") === "true") {
         startTieBreak();
       }
+      saveLiveScore(); // Salva il punteggio in tempo reale
     }
   }
 }
@@ -1514,20 +1637,20 @@ function resetAll() {
 // Ascoltatori eventi per i bottoni dei giocatori
 
 // Funzione per disabilitare temporaneamente i bottoni del punteggio
-function disableButtonsTemporarily() {
-  const buttons = document.querySelectorAll(
-    ".btn-player1, .btn-erroreP1, .btn-aceP1, .btn-FalloP1, .btn-player2, .btn-erroreP2, .btn-aceP2, .btn-FalloP2"
-  );
-  buttons.forEach((button) => {
-    button.disabled = true;
-  });
+// function disableButtonsTemporarily() {
+//   const buttons = document.querySelectorAll(
+//     ".btn-player1, .btn-erroreP1, .btn-aceP1, .btn-FalloP1, .btn-player2, .btn-erroreP2, .btn-aceP2, .btn-FalloP2"
+//   );
+//   buttons.forEach((button) => {
+//     button.disabled = true;
+//   });
 
-  setTimeout(() => {
-    buttons.forEach((button) => {
-      button.disabled = false;
-    });
-  }, 1000); // 1000 millisecondi = 1 secondo
-}
+//   setTimeout(() => {
+//     buttons.forEach((button) => {
+//       button.disabled = false;
+//     });
+//   }, 1000); // 1000 millisecondi = 1 secondo
+// }
 
 btnPlayer1.addEventListener("click", () => {
   updateScore(1);
@@ -1599,10 +1722,34 @@ function saveFinishedMatch() {
   localStorage.setItem("finishedMatches", JSON.stringify(finishedMatches));
 }
 
+// // Funzione per generare un numero casuale di 6 cifre come stringa
+// function generateNumericId(length = 6) {
+//   let id = "";
+//   for (let i = 0; i < length; i++) {
+//     id += Math.floor(Math.random() * 10);
+//   }
+//   return id;
+// }
+
+// // Funzione per generare un ID numerico di 6 cifre NON duplicato su Firebase
+// async function generateUniqueMatchId() {
+//   let matchId;
+//   let exists = true;
+//   while (exists) {
+//     matchId = generateNumericId(6);
+//     const snapshot = await firebase
+//       .database()
+//       .ref("matches/" + matchId)
+//       .once("value");
+//     exists = snapshot.exists();
+//   }
+//   return matchId;
+// }
+
 // Ascoltatore per iniziare una nuova partita
 newMatch.addEventListener("click", () => {
   // Genera un identificatore univoco per la nuova partita
-  const matchId = Date.now().toString();
+  // const matchId = await generateUniqueMatchId();
   localStorage.setItem("currentMatchId", matchId);
 
   // 1. Reset dei punteggi e delle variabili
@@ -1680,3 +1827,22 @@ if (matchSettings) {
   document.querySelector("#score-game").textContent = gameCount;
   document.querySelector("#score-set").textContent = setCount;
 }
+
+document.getElementById("link-match").addEventListener("click", () => {
+  const matchId = localStorage.getItem("currentMatchId");
+  const matchSettings = JSON.parse(localStorage.getItem("matchSettings"));
+
+  if (matchId && matchSettings) {
+    const { nameMatch, nameP1, nameP2 } = matchSettings;
+    const textToShare = `Guarda LIVE! ID Partita: ${matchId}\nGiocatori: ${nameP1} vs ${nameP2}`;
+    const encodedText = encodeURIComponent(textToShare);
+    const whatsappUrl = `https://wa.me/?text=${encodedText}`;
+
+    // Apri il link WhatsApp
+    window.open(whatsappUrl, "_blank");
+  } else {
+    alert(
+      "Impossibile condividere. Assicurati che la partita sia configurata correttamente."
+    );
+  }
+});
