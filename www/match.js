@@ -1,14 +1,4 @@
-const firebaseConfig = {
-  apiKey: "AIzaSyA5Cib2bfjmmARWwUCin44FdSKPPphvjQw",
-  authDomain: "tennis-points-569a7.firebaseapp.com",
-  databaseURL:
-    "https://tennis-points-569a7-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "tennis-points-569a7",
-  storageBucket: "tennis-points-569a7.firebasestorage.app",
-  messagingSenderId: "1043880828352",
-  appId: "1:1043880828352:web:4864880850fab9d6bc7c25",
-};
-firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(window.firebaseConfig);
 
 const matchId = localStorage.getItem("currentMatchId");
 if (matchId) {
@@ -1637,20 +1627,20 @@ function resetAll() {
 // Ascoltatori eventi per i bottoni dei giocatori
 
 // Funzione per disabilitare temporaneamente i bottoni del punteggio
-// function disableButtonsTemporarily() {
-//   const buttons = document.querySelectorAll(
-//     ".btn-player1, .btn-erroreP1, .btn-aceP1, .btn-FalloP1, .btn-player2, .btn-erroreP2, .btn-aceP2, .btn-FalloP2"
-//   );
-//   buttons.forEach((button) => {
-//     button.disabled = true;
-//   });
+function disableButtonsTemporarily() {
+  const buttons = document.querySelectorAll(
+    ".btn-player1, .btn-erroreP1, .btn-aceP1, .btn-FalloP1, .btn-player2, .btn-erroreP2, .btn-aceP2, .btn-FalloP2"
+  );
+  buttons.forEach((button) => {
+    button.disabled = true;
+  });
 
-//   setTimeout(() => {
-//     buttons.forEach((button) => {
-//       button.disabled = false;
-//     });
-//   }, 1000); // 1000 millisecondi = 1 secondo
-// }
+  setTimeout(() => {
+    buttons.forEach((button) => {
+      button.disabled = false;
+    });
+  }, 1000); // 1000 millisecondi = 1 secondo
+}
 
 btnPlayer1.addEventListener("click", () => {
   updateScore(1);

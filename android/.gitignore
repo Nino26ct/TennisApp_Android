@@ -109,3 +109,6 @@ app/src/main/res/xml/config.xml
 /app/build/
 /out/
 *.log
+
+www/firebase-config.js
+
